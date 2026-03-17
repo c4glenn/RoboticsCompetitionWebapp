@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { auth, signOut } from "@/server/auth";
-import { redirect } from "next/navigation";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { UserDropdown } from "./UserDropdown";
 
 export default async function DashboardLayout({
   children,
@@ -9,7 +8,13 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+
+  const signOutAction = session?.user
+    ? async () => {
+        "use server";
+        await signOut();
+      }
+    : null;
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -21,23 +26,10 @@ export default async function DashboardLayout({
           >
             Robotics Manager
           </Link>
-          <div className="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400">
-            <span>{session.user.name ?? session.user.email}</span>
-            <ThemeToggle />
-            <form
-              action={async () => {
-                "use server";
-                await signOut();
-              }}
-            >
-              <button
-                type="submit"
-                className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
+          <UserDropdown
+            userName={session?.user?.name ?? session?.user?.email ?? null}
+            signOutAction={signOutAction}
+          />
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>

@@ -49,10 +49,10 @@ export default function RefereeScorePage({
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6">
         <Link
-          href="/dashboard"
+          href={`/dashboard/tournaments/${tournamentId}`}
           className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
         >
-          ← Dashboard
+          ← Overview
         </Link>
         <h1 className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
           Referee Scoring

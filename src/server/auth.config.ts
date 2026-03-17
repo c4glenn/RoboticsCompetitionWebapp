@@ -1,6 +1,12 @@
 import type { NextAuthConfig } from "next-auth";
 
-const protectedPrefixes = ["/dashboard", "/referee", "/judge", "/inspect"];
+const protectedPrefixes = [
+  "/dashboard/tournaments",
+  "/dashboard/competition-types",
+  "/referee",
+  "/judge",
+  "/inspect",
+];
 
 /**
  * Edge-compatible Auth.js config — no Node.js-only imports (no DB, no bcrypt).
