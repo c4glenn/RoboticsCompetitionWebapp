@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { tournaments } from "@/db/schema";
 import { notFound, redirect } from "next/navigation";
+import { TeamDashboardPanel } from "./TeamDashboardPanel";
 
 export default async function TournamentPage({
   params,
@@ -35,6 +36,19 @@ export default async function TournamentPage({
   const isDirector = userRole?.role === "DIRECTOR";
   const canInspectOrReferee = isDirector || userRole?.role === "REFEREE";
   const canJudge = isDirector || userRole?.role === "JUDGE";
+  const isTeamLead = userRole?.role === "TEAM_LEAD";
+  const canViewAnyTeam =
+    isDirector ||
+    userRole?.role === "VOLUNTEER" ||
+    userRole?.role === "CHECK_IN_TABLE" ||
+    userRole?.role === "REFEREE" ||
+    userRole?.role === "JUDGE";
+
+  const teamLeadTeamId = isTeamLead
+    ? (tournament.teams.find((t) => t.teamLeadUserId === session.user.id)?.id ?? null)
+    : null;
+
+  const allTeams = tournament.teams.map((t) => ({ id: t.id, name: t.name }));
   const totalTeams = tournament.teams.length;
   const checkedInTeams = tournament.teams.filter((t) => t.checkedIn);
   const checkedInCount = checkedInTeams.length;
@@ -180,6 +194,15 @@ export default async function TournamentPage({
           )}
         </section>
       </div>
+
+      {(isTeamLead || canViewAnyTeam) && (
+        <TeamDashboardPanel
+          tournamentId={id}
+          defaultTeamId={teamLeadTeamId}
+          canSelectTeam={canViewAnyTeam}
+          allTeams={allTeams}
+        />
+      )}
     </div>
   );
 }
