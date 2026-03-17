@@ -1,0 +1,13 @@
+.git
+.gitignore
+node_modules
+.next
+.env*
+uploads
+*.md
+docker-compose*.yml
+Dockerfile
+playwright.config.ts
+vitest.config.ts
+src/tests
+src/e2e

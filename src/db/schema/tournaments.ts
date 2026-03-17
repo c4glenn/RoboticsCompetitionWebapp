@@ -1,0 +1,85 @@
+import { pgTable, text, timestamp, uuid, jsonb, integer } from "drizzle-orm/pg-core";
+
+// ── JSON shape types ──────────────────────────────────────────────────────────
+
+export interface FormField {
+  name: string;
+  label: string;
+  type: "number" | "select" | "checkbox" | "text" | "textarea";
+  options?: { value: string; label: string }[];
+  min?: number;
+  max?: number;
+  required?: boolean;
+  defaultValue?: string | number | boolean;
+}
+
+export interface FormSchema {
+  fields: FormField[];
+}
+
+export interface ScoringRule {
+  field: string;
+  /** Points multiplied by the field's numeric value */
+  pointsPer?: number;
+  /** Map of field value → points (for discrete select fields) */
+  values?: Record<string, number>;
+}
+
+export interface ScoringLogic {
+  rules: ScoringRule[];
+}
+
+export type ScoreAggregationMethod = "best_n" | "average" | "sum";
+
+/**
+ * How to aggregate multiple match scores per team into a single leaderboard score.
+ * - best_n: take the top `n` scores and sum them (e.g. best 2 of 3)
+ * - average: average all scores
+ * - sum: sum all scores
+ */
+export interface ScoreAggregation {
+  method: ScoreAggregationMethod;
+  /** For best_n: how many top scores to use. Defaults to 1. */
+  n?: number;
+}
+
+// ── Tables ────────────────────────────────────────────────────────────────────
+
+export const competitionTypes = pgTable("competition_types", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  inspectionFormSchema: jsonb("inspection_form_schema")
+    .$type<FormSchema>()
+    .notNull(),
+  refereeFormSchema: jsonb("referee_form_schema")
+    .$type<FormSchema>()
+    .notNull(),
+  judgingFormSchema: jsonb("judging_form_schema").$type<FormSchema>(),
+  scoringLogic: jsonb("scoring_logic").$type<ScoringLogic>().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const tournaments = pgTable("tournaments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  logoUrl: text("logo_url"),
+  competitionTypeId: uuid("competition_type_id")
+    .notNull()
+    .references(() => competitionTypes.id),
+  /** How many qualification matches each team is scheduled to play. */
+  matchesPerTeam: integer("matches_per_team").notNull().default(3),
+  /** How to aggregate multiple match scores into one leaderboard score. */
+  scoreAggregation: jsonb("score_aggregation")
+    .$type<ScoreAggregation>()
+    .notNull()
+    .default({ method: "best_n", n: 2 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const tournamentClasses = pgTable("tournament_classes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tournamentId: uuid("tournament_id")
+    .notNull()
+    .references(() => tournaments.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+});

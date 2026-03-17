@@ -1,0 +1,28 @@
+services:
+  db:
+    restart: unless-stopped
+    ports: []
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/backups
+
+  app:
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      AUTH_SECRET: ${AUTH_SECRET}
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  postgres_data:
+  postgres_backups:
+  uploads_data:
