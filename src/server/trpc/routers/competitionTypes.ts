@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { router, publicProcedure, protectedProcedure } from "../init";
 import { competitionTypes } from "@/db/schema";
@@ -28,9 +28,25 @@ const scoringRuleSchema = z.object({
 const scoringLogicSchema = z.object({ rules: z.array(scoringRuleSchema) });
 
 export const competitionTypesRouter = router({
-  list: publicProcedure.query(({ ctx }) =>
-    ctx.db.select().from(competitionTypes)
-  ),
+  /** Returns all public types + the current user's private types (if logged in). */
+  list: publicProcedure.query(({ ctx }) => {
+    const userId = ctx.session?.user?.id;
+    if (userId) {
+      return ctx.db
+        .select()
+        .from(competitionTypes)
+        .where(
+          or(
+            eq(competitionTypes.isPublic, true),
+            eq(competitionTypes.createdByUserId, userId)
+          )
+        );
+    }
+    return ctx.db
+      .select()
+      .from(competitionTypes)
+      .where(eq(competitionTypes.isPublic, true));
+  }),
 
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -46,6 +62,8 @@ export const competitionTypesRouter = router({
     .input(
       z.object({
         name: z.string().min(1).max(200),
+        isPublic: z.boolean().default(true),
+        matchDurationMinutes: z.number().int().min(1).default(5),
         inspectionFormSchema: formSchemaZ,
         refereeFormSchema: formSchemaZ,
         judgingFormSchema: formSchemaZ.optional(),
@@ -55,7 +73,7 @@ export const competitionTypesRouter = router({
     .mutation(async ({ ctx, input }) => {
       const [ct] = await ctx.db
         .insert(competitionTypes)
-        .values(input)
+        .values({ ...input, createdByUserId: ctx.user.id })
         .returning();
       return ct;
     }),
@@ -65,6 +83,8 @@ export const competitionTypesRouter = router({
       z.object({
         id: z.string(),
         name: z.string().min(1).max(200).optional(),
+        isPublic: z.boolean().optional(),
+        matchDurationMinutes: z.number().int().min(1).optional(),
         inspectionFormSchema: formSchemaZ.optional(),
         refereeFormSchema: formSchemaZ.optional(),
         judgingFormSchema: formSchemaZ.nullable().optional(),
@@ -77,6 +97,13 @@ export const competitionTypesRouter = router({
         where: eq(competitionTypes.id, id),
       });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (existing.createdByUserId && existing.createdByUserId !== ctx.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only the owner can edit this competition type.",
+        });
+      }
 
       const [updated] = await ctx.db
         .update(competitionTypes)

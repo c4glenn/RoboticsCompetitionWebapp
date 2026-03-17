@@ -35,12 +35,18 @@ export default function SettingsPage({
   const [aggN, setAggN] = useState<string>("2");
   const [showJudgingScores, setShowJudgingScores] = useState(false);
 
+  // --- Practice field settings ---
+  const [practiceSlotDuration, setPracticeSlotDuration] = useState<string>("15");
+  const [maxFuturePracticeSlots, setMaxFuturePracticeSlots] = useState<string>("1");
+
   useEffect(() => {
     if (tournament) {
       setMatchesPerTeam(String(tournament.matchesPerTeam ?? 3));
       setAggMethod((tournament.scoreAggregation?.method ?? "best_n") as ScoreAggregationMethod);
       setAggN(String(tournament.scoreAggregation?.n ?? 2));
       setShowJudgingScores(tournament.showJudgingScores ?? false);
+      setPracticeSlotDuration(String(tournament.practiceSlotDurationMinutes ?? 15));
+      setMaxFuturePracticeSlots(String(tournament.maxFuturePracticeSlots ?? 1));
     }
   }, [tournament]);
 
@@ -86,15 +92,23 @@ export default function SettingsPage({
   // --- Role assignment ---
   const [roleEmail, setRoleEmail] = useState("");
   const [roleToAssign, setRoleToAssign] = useState<Role>("REFEREE");
+  const [roleTeamId, setRoleTeamId] = useState("");
   const [roleError, setRoleError] = useState<string | null>(null);
+
+  const { data: teamsForRole } = trpc.teams.list.useQuery(
+    { tournamentId },
+    { enabled: roleToAssign === "TEAM_LEAD" }
+  );
 
   const findUser = trpc.roles.findUserByEmail.useQuery(
     { email: roleEmail },
     { enabled: false }
   );
 
+  const updateTeamLead = trpc.teams.update.useMutation();
+
   const assignRole = trpc.roles.assign.useMutation({
-    onSuccess: () => { refetchRoles(); setRoleEmail(""); setRoleError(null); },
+    onSuccess: () => { refetchRoles(); setRoleEmail(""); setRoleTeamId(""); setRoleError(null); },
     onError: (e) => setRoleError(e.message),
   });
 
@@ -110,11 +124,17 @@ export default function SettingsPage({
       setRoleError("User not found.");
       return;
     }
-    assignRole.mutate({
-      tournamentId,
-      userId: result.data.id,
-      role: roleToAssign,
-    });
+    const userId = result.data.id;
+    assignRole.mutate(
+      { tournamentId, userId, role: roleToAssign },
+      {
+        onSuccess: () => {
+          if (roleToAssign === "TEAM_LEAD" && roleTeamId) {
+            updateTeamLead.mutate({ id: roleTeamId, tournamentId, teamLeadUserId: userId });
+          }
+        },
+      }
+    );
   }
 
   const isDirector = tournament?.userRoles?.some((r) => r.role === "DIRECTOR");
@@ -461,6 +481,71 @@ export default function SettingsPage({
         </section>
       )}
 
+      {/* Practice field settings */}
+      {isDirector && (
+        <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="mb-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            Practice Field Settings
+          </h2>
+          <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+            Controls how teams book time on practice fields. Applies to all
+            practice fields in this tournament.
+          </p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateSettings.mutate({
+                id: tournamentId,
+                practiceSlotDurationMinutes: parseInt(practiceSlotDuration),
+                maxFuturePracticeSlots: parseInt(maxFuturePracticeSlots),
+              });
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Slot duration (minutes)
+              </label>
+              <input
+                type="number"
+                min={5}
+                max={120}
+                step={5}
+                required
+                value={practiceSlotDuration}
+                onChange={(e) => setPracticeSlotDuration(e.target.value)}
+                className={inputCls + " w-28"}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Max upcoming slots per team
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={10}
+                required
+                value={maxFuturePracticeSlots}
+                onChange={(e) => setMaxFuturePracticeSlots(e.target.value)}
+                className={inputCls + " w-20"}
+              />
+              <p className="mt-1 text-xs text-zinc-400">
+                A team may hold this many future bookings at once. Once a slot
+                passes it no longer counts, so the team may book another.
+              </p>
+            </div>
+            <button
+              type="submit"
+              disabled={updateSettings.isPending}
+              className={btnPrimary}
+            >
+              {updateSettings.isPending ? "Saving…" : "Save Practice Settings"}
+            </button>
+          </form>
+        </section>
+      )}
+
       {/* Role management */}
       {isDirector && (
         <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
@@ -507,7 +592,7 @@ export default function SettingsPage({
               />
               <select
                 value={roleToAssign}
-                onChange={(e) => setRoleToAssign(e.target.value as Role)}
+                onChange={(e) => { setRoleToAssign(e.target.value as Role); setRoleTeamId(""); }}
                 className={inputCls + " w-36"}
               >
                 {ALL_ROLES.map((r) => (
@@ -516,6 +601,18 @@ export default function SettingsPage({
               </select>
               <button type="submit" className={btnPrimary}>Assign</button>
             </div>
+            {roleToAssign === "TEAM_LEAD" && (
+              <select
+                value={roleTeamId}
+                onChange={(e) => setRoleTeamId(e.target.value)}
+                className={inputCls + " w-full"}
+              >
+                <option value="">Assign to team (optional)…</option>
+                {teamsForRole?.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            )}
             {roleError && (
               <p className="text-sm text-red-600 dark:text-red-400">{roleError}</p>
             )}

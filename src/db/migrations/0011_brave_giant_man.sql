@@ -1,0 +1,3 @@
+ALTER TABLE "competition_types" ADD COLUMN "is_public" boolean DEFAULT true NOT NULL;--> statement-breakpoint
+ALTER TABLE "competition_types" ADD COLUMN "created_by_user_id" text;--> statement-breakpoint
+ALTER TABLE "competition_types" ADD CONSTRAINT "competition_types_created_by_user_id_users_id_fk" FOREIGN KEY ("created_by_user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;

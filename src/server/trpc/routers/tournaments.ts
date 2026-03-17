@@ -183,6 +183,8 @@ export const tournamentsRouter = router({
           })
           .optional(),
         showJudgingScores: z.boolean().optional(),
+        practiceSlotDurationMinutes: z.number().int().min(5).max(120).optional(),
+        maxFuturePracticeSlots: z.number().int().min(1).max(10).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -198,6 +200,8 @@ export const tournamentsRouter = router({
         matchesPerTeam?: number;
         scoreAggregation?: ScoreAggregation;
         showJudgingScores?: boolean;
+        practiceSlotDurationMinutes?: number;
+        maxFuturePracticeSlots?: number;
       } = {};
       if (data.matchesPerTeam !== undefined)
         updateData.matchesPerTeam = data.matchesPerTeam;
@@ -205,6 +209,10 @@ export const tournamentsRouter = router({
         updateData.scoreAggregation = data.scoreAggregation;
       if (data.showJudgingScores !== undefined)
         updateData.showJudgingScores = data.showJudgingScores;
+      if (data.practiceSlotDurationMinutes !== undefined)
+        updateData.practiceSlotDurationMinutes = data.practiceSlotDurationMinutes;
+      if (data.maxFuturePracticeSlots !== undefined)
+        updateData.maxFuturePracticeSlots = data.maxFuturePracticeSlots;
 
       const [updated] = await ctx.db
         .update(tournaments)

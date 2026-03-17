@@ -33,7 +33,8 @@ export default async function TournamentPage({
     (r) => r.userId === session.user.id
   );
   const isDirector = userRole?.role === "DIRECTOR";
-
+  const canInspectOrReferee = isDirector || userRole?.role === "REFEREE";
+  const canJudge = isDirector || userRole?.role === "JUDGE";
   const totalTeams = tournament.teams.length;
   const checkedInTeams = tournament.teams.filter((t) => t.checkedIn);
   const checkedInCount = checkedInTeams.length;
@@ -69,11 +70,12 @@ export default async function TournamentPage({
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
-        <QuickLink href={`/inspect/${id}`} label="Inspection" />
-        <QuickLink href={`/referee/${id}/score`} label="Referee" />
-        <QuickLink href={`/judge/${id}/score`} label="Judge" />
+        {canInspectOrReferee && <QuickLink href={`/inspect/${id}`} label="Inspection" />}
+        {canInspectOrReferee && <QuickLink href={`/referee/${id}/score`} label="Referee" />}
+        {canJudge && <QuickLink href={`/judge/${id}/score`} label="Judge" />}
         <QuickLink href={`/tournaments/${id}/leaderboard`} label="Scoreboard" external />
         <QuickLink href={`/tournaments/${id}/schedule`} label="Schedule" external/>
+        <QuickLink href={`/tournaments/${id}/practice`} label="Practice Fields" external />
         {isDirector && (
           <QuickLink href={`/dashboard/tournaments/${id}/volunteers`} label="Volunteers" />
         )}
@@ -86,50 +88,57 @@ export default async function TournamentPage({
           href={`/dashboard/tournaments/${id}/teams`}
           action={isDirector ? "Manage" : "View"}
         />
-        <SummaryCard
+
+        
+        {tournament.fields.some((f) => f.isPractice) && (
+          <SummaryCard
+            title="Practice Fields"
+            count={tournament.fields.filter((f) => f.isPractice).length}
+            href={`/dashboard/tournaments/${id}/practice-fields`}
+            action="Book Slots"
+          />
+        )}
+        {isDirector && (<SummaryCard
           title="Matches"
           count={tournament.matches.length}
           href={`/dashboard/tournaments/${id}/matches`}
           action={isDirector ? "Manage" : "View"}
-        />
-        <SummaryCard
+        />)}
+        
+        {isDirector && (<SummaryCard
           title="Fields"
           count={tournament.fields.length}
           href={`/dashboard/tournaments/${id}/fields`}
           action={isDirector ? "Manage" : "View"}
-        />
-      </div>
-
-      {isDirector && (
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          <SummaryCard
+        />)}
+        {isDirector && (<SummaryCard
             title="Volunteers"
             count={tournament.volunteerApplications?.filter((a) => a.status === "PENDING").length ?? 0}
             href={`/dashboard/tournaments/${id}/volunteers`}
             action="Review"
-          />
-          <SummaryCard
+          />)}
+        {isDirector && (<SummaryCard
           title="Roles"
           count={tournament.userRoles.length}
           href={`/dashboard/tournaments/${id}/settings`}
           action={isDirector ? "Manage" : "View"}
-        />
-        </div>
-      )}
+        />)}
+      </div>
 
       {totalTeams > 0 && (
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <ProgressWidget
+          {isDirector && (<ProgressWidget
             title="Checked In"
             count={checkedInCount}
             total={totalTeams}
             href={`/dashboard/tournaments/${id}/teams`}
-          />
-          <ProgressWidget
+          />)}
+
+          {canInspectOrReferee && (<ProgressWidget
             title="Passed Inspection"
             count={passedInspectionCount}
             total={checkedInCount}
-          />
+          />)}
         </div>
       )}
 
@@ -159,7 +168,7 @@ export default async function TournamentPage({
             <p className="text-sm text-zinc-400">No roles assigned.</p>
           ) : (
             <ul className="space-y-1">
-              {tournament.userRoles.map((r) => (
+              {tournament.userRoles.filter((r) => r.role !== "TEAM_LEAD").map((r) => (
                 <li key={r.id} className="flex items-center justify-between text-sm">
                   <span className="text-zinc-700 dark:text-zinc-300">
                     {r.user.name ?? r.user.email}

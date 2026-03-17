@@ -10,6 +10,7 @@ type CsvRow = {
   classId: string | null;
   pitNumber: number | undefined;
   schoolOrOrg: string | undefined;
+  teamLeadEmail: string | undefined;
   error: string | null;
 };
 
@@ -31,6 +32,7 @@ export default function TeamsPage({
   const [classId, setClassId] = useState("");
   const [pitNumber, setPitNumber] = useState("");
   const [schoolOrOrg, setSchoolOrOrg] = useState("");
+  const [teamLeadEmail, setTeamLeadEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const [showCsvImport, setShowCsvImport] = useState(false);
@@ -88,7 +90,7 @@ export default function TeamsPage({
       .filter((l) => l.trim())
       .map((line) => {
         const cols = line.split(",").map((c) => c.trim().replace(/^"|"$/g, ""));
-        const [rawName = "", rawClass = "", rawPit = "", rawOrg = ""] = cols;
+        const [rawName = "", rawClass = "", rawPit = "", rawOrg = "", rawEmail = ""] = cols;
         const matched = classes.find(
           (c) => c.name.toLowerCase() === rawClass.toLowerCase()
         );
@@ -99,6 +101,7 @@ export default function TeamsPage({
           classId: matched?.id ?? null,
           pitNumber: pit && !isNaN(pit) ? pit : undefined,
           schoolOrOrg: rawOrg || undefined,
+          teamLeadEmail: rawEmail || undefined,
           error: !rawName
             ? "Missing name"
             : !matched
@@ -136,6 +139,7 @@ export default function TeamsPage({
         classId: r.classId!,
         pitNumber: r.pitNumber,
         schoolOrOrg: r.schoolOrOrg,
+        teamLeadEmail: r.teamLeadEmail,
       })),
     });
   }
@@ -147,6 +151,7 @@ export default function TeamsPage({
     setClassId("");
     setPitNumber("");
     setSchoolOrOrg("");
+    setTeamLeadEmail("");
     setError(null);
   }
 
@@ -156,6 +161,7 @@ export default function TeamsPage({
     setClassId(team.classId);
     setPitNumber(team.pitNumber?.toString() ?? "");
     setSchoolOrOrg(team.schoolOrOrg ?? "");
+    setTeamLeadEmail(team.teamLeadEmail ?? "");
     setShowForm(true);
     setError(null);
   }
@@ -172,6 +178,7 @@ export default function TeamsPage({
         classId,
         pitNumber: pit ?? null,
         schoolOrOrg: schoolOrOrg || null,
+        teamLeadEmail: teamLeadEmail || null,
       });
     } else {
       create.mutate({
@@ -180,6 +187,7 @@ export default function TeamsPage({
         classId,
         pitNumber: pit,
         schoolOrOrg: schoolOrOrg || undefined,
+        teamLeadEmail: teamLeadEmail || undefined,
       });
     }
   }
@@ -256,6 +264,13 @@ export default function TeamsPage({
               placeholder="School / Org (optional)"
               className={inputCls}
             />
+            <input
+              type="email"
+              value={teamLeadEmail}
+              onChange={(e) => setTeamLeadEmail(e.target.value)}
+              placeholder="Team lead email (optional)"
+              className={inputCls}
+            />
           </div>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <div className="flex gap-2">
@@ -282,7 +297,7 @@ export default function TeamsPage({
           <div>
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Import Teams from CSV</h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Columns: <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">name, class, pitNumber (optional), schoolOrOrg (optional)</code>
+              Columns: <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">name, class, pitNumber (optional), schoolOrOrg (optional), teamLeadEmail (optional)</code>
               <br />
               Class must match one of: {tournament?.classes?.map((c) => c.name).join(", ")}
             </p>
@@ -305,6 +320,7 @@ export default function TeamsPage({
                     <th className="px-3 py-2 text-left font-medium text-zinc-500">Class</th>
                     <th className="px-3 py-2 text-left font-medium text-zinc-500">Pit</th>
                     <th className="px-3 py-2 text-left font-medium text-zinc-500">School/Org</th>
+                    <th className="px-3 py-2 text-left font-medium text-zinc-500">Team Lead Email</th>
                     <th className="px-3 py-2 text-left font-medium text-zinc-500">Status</th>
                   </tr>
                 </thead>
@@ -315,6 +331,7 @@ export default function TeamsPage({
                       <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400">{row.className || <span className="text-zinc-400">—</span>}</td>
                       <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400">{row.pitNumber ?? "—"}</td>
                       <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400">{row.schoolOrOrg ?? "—"}</td>
+                      <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400">{row.teamLeadEmail ?? "—"}</td>
                       <td className="px-3 py-2">
                         {row.error
                           ? <span className="text-red-600 dark:text-red-400">{row.error}</span>
@@ -367,6 +384,8 @@ export default function TeamsPage({
                 <th className="px-4 py-3 text-left font-medium text-zinc-500">Class</th>
                 <th className="px-4 py-3 text-left font-medium text-zinc-500">Pit</th>
                 <th className="px-4 py-3 text-left font-medium text-zinc-500">School/Org</th>
+                <th className="px-4 py-3 text-left font-medium text-zinc-500">Team Lead</th>
+                <th className="px-4 py-3 text-left font-medium text-zinc-500">Inspection</th>
                 <th className="px-4 py-3 text-left font-medium text-zinc-500">Checked In</th>
                 {canEditTeams && <th className="px-4 py-3" />}
               </tr>
@@ -381,6 +400,18 @@ export default function TeamsPage({
                   <td className="px-4 py-3 text-zinc-500">{team.class?.name}</td>
                   <td className="px-4 py-3 text-zinc-500">{team.pitNumber ?? "—"}</td>
                   <td className="px-4 py-3 text-zinc-500">{team.schoolOrOrg ?? "—"}</td>
+                  <td className="px-4 py-3 text-zinc-500 text-xs">
+                    {team.teamLeadDisplayName ?? "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    {team.inspections[0] == null ? (
+                      <span className="text-zinc-400 text-xs">—</span>
+                    ) : team.inspections[0].passed ? (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-400">Pass</span>
+                    ) : (
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/40 dark:text-red-400">Fail</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <input
                       type="checkbox"

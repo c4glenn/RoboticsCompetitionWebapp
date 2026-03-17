@@ -231,8 +231,8 @@ async function seed() {
       .returning();
 
     await db.insert(schema.matchTeams).values([
-      { matchId: match.id, teamId: allTeams[aIdx].id, side: "HOME", fieldId: field.id },
-      { matchId: match.id, teamId: allTeams[bIdx].id, side: "AWAY", fieldId: field.id },
+      { matchId: match.id, teamId: allTeams[aIdx].id, fieldId: field.id },
+      { matchId: match.id, teamId: allTeams[bIdx].id, fieldId: field.id },
     ]);
   }
 

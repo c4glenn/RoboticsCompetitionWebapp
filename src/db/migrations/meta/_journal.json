@@ -78,6 +78,27 @@
       "when": 1773793000000,
       "tag": "0010_match_duration",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1773720380591,
+      "tag": "0011_brave_giant_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1773729372605,
+      "tag": "0012_practice_field_slots",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1742169600000,
+      "tag": "0013_team_lead_email",
+      "breakpoints": true
     }
   ]
 }

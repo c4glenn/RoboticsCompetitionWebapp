@@ -17,5 +17,6 @@ export const teams = pgTable("teams", {
   teamLeadUserId: text("team_lead_user_id").references(() => users.id, {
     onDelete: "set null",
   }),
+  teamLeadEmail: text("team_lead_email"),
   checkedIn: boolean("checked_in").notNull().default(false),
 });

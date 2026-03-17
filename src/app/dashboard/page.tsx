@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { userTournamentRoles } from "@/db/schema";
 import { redirect } from "next/navigation";
+import { CompetitionTypesClient } from "./competition-types/CompetitionTypesClient";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -83,6 +84,10 @@ export default async function DashboardPage() {
           ))}
         </div>
       )}
+
+      <div className="mt-12">
+        <CompetitionTypesClient currentUserId={session.user.id} />
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { scoringRouter } from "./routers/scoring";
 import { leaderboardRouter } from "./routers/leaderboard";
 import { matchesRouter } from "./routers/matches";
 import { volunteerApplicationsRouter } from "./routers/volunteerApplications";
+import { practiceFieldsRouter } from "./routers/practiceFields";
 
 export const appRouter = router({
   tournaments: tournamentsRouter,
@@ -19,6 +20,7 @@ export const appRouter = router({
   leaderboard: leaderboardRouter,
   matches: matchesRouter,
   volunteerApplications: volunteerApplicationsRouter,
+  practiceFields: practiceFieldsRouter,
 });
 
 export type AppRouter = typeof appRouter;

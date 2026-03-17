@@ -6,4 +6,5 @@ export * from "./roles";
 export * from "./matches";
 export * from "./scores";
 export * from "./volunteerApplications";
+export * from "./practiceFieldSlots";
 export * from "./relations";

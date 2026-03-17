@@ -11,6 +11,7 @@ import { userTournamentRoles } from "./roles";
 import { matches, matchTeams } from "./matches";
 import { scores, inspections, judgingScores } from "./scores";
 import { volunteerApplications } from "./volunteerApplications";
+import { practiceFieldSlots } from "./practiceFieldSlots";
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
@@ -21,6 +22,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   inspections: many(inspections),
   judgingScores: many(judgingScores),
   volunteerApplications: many(volunteerApplications),
+  practiceFieldSlots: many(practiceFieldSlots),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -33,8 +35,12 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 
 export const competitionTypesRelations = relations(
   competitionTypes,
-  ({ many }) => ({
+  ({ one, many }) => ({
     tournaments: many(tournaments),
+    createdBy: one(users, {
+      fields: [competitionTypes.createdByUserId],
+      references: [users.id],
+    }),
   })
 );
 
@@ -51,6 +57,7 @@ export const tournamentsRelations = relations(tournaments, ({ one, many }) => ({
   inspections: many(inspections),
   judgingScores: many(judgingScores),
   volunteerApplications: many(volunteerApplications),
+  practiceFieldSlots: many(practiceFieldSlots),
 }));
 
 export const tournamentClassesRelations = relations(
@@ -70,6 +77,7 @@ export const fieldsRelations = relations(fields, ({ one, many }) => ({
     references: [tournaments.id],
   }),
   matchTeams: many(matchTeams),
+  practiceFieldSlots: many(practiceFieldSlots),
 }));
 
 export const teamsRelations = relations(teams, ({ one, many }) => ({
@@ -89,6 +97,7 @@ export const teamsRelations = relations(teams, ({ one, many }) => ({
   scores: many(scores),
   inspections: many(inspections),
   judgingScores: many(judgingScores),
+  practiceFieldSlots: many(practiceFieldSlots),
 }));
 
 export const userTournamentRolesRelations = relations(
@@ -183,6 +192,28 @@ export const volunteerApplicationsRelations = relations(
     }),
     user: one(users, {
       fields: [volunteerApplications.userId],
+      references: [users.id],
+    }),
+  })
+);
+
+export const practiceFieldSlotsRelations = relations(
+  practiceFieldSlots,
+  ({ one }) => ({
+    tournament: one(tournaments, {
+      fields: [practiceFieldSlots.tournamentId],
+      references: [tournaments.id],
+    }),
+    field: one(fields, {
+      fields: [practiceFieldSlots.fieldId],
+      references: [fields.id],
+    }),
+    team: one(teams, {
+      fields: [practiceFieldSlots.teamId],
+      references: [teams.id],
+    }),
+    bookedBy: one(users, {
+      fields: [practiceFieldSlots.bookedByUserId],
       references: [users.id],
     }),
   })
