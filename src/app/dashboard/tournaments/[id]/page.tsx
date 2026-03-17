@@ -61,25 +61,21 @@ export default async function TournamentPage({
       <div className="mb-6">
         <Link
           href="/dashboard"
-          className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
+          className="text-sm text-zinc-500 hover:text-violet-700 dark:hover:text-violet-700"
         >
           ← Dashboard
         </Link>
         <div className="mt-2 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+            <h1 className="text-2xl font-semibold text-violet-700 dark:text-violet-500">
               {tournament.name}
             </h1>
             <p className="text-sm text-zinc-500">{tournament.competitionType.name}</p>
           </div>
           {isDirector && (
-            <Link
-              href={`/dashboard/tournaments/${id}/settings`}
-              className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
-            >
-              Settings
-            </Link>
-          )}
+          <QuickLink href={`/dashboard/tournaments/${id}/settings`} label="Settings" />
+        )}
+
         </div>
       </div>
 
@@ -220,7 +216,7 @@ function QuickLink({
     <Link
       href={href}
       target={external ? "_blank" : undefined}
-      className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
+      className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 hover:border-violet-700 dark:hover:border-violet-700"
     >
       {label}
       {external && <span className="ml-1 text-zinc-400">↗</span>}
@@ -250,7 +246,7 @@ function ProgressWidget({
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
         <div
-          className="h-full rounded-full bg-zinc-900 dark:bg-zinc-50 transition-all"
+          className="h-full rounded-full bg-violet-700 transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -275,17 +271,19 @@ function SummaryCard({
   action: string;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <a href={href}>
+    <div className="rounded-xl border group border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 hover:border-violet-700 dark:hover:border-violet-700 hover:bg-zinc-50 dark:hover:bg-zinc-800">
       <p className="text-xs text-zinc-500">{title}</p>
-      <p className="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+      <p className="mt-1 text-3xl font-bold group-hover:text-violet-700 dark:group-hover:text-violet-500">
         {count}
       </p>
       <Link
         href={href}
-        className="mt-2 inline-block text-xs font-medium text-zinc-500 underline-offset-4 hover:underline"
+        className="mt-2 inline-block text-xs font-medium text-zinc-500 underline-offset-4 group-hover:underline group-hover:text-violet-500"
       >
         {action} →
       </Link>
     </div>
+    </a>
   );
 }

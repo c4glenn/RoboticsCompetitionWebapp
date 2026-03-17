@@ -77,7 +77,7 @@ export default function FieldsPage({
         {isDirector && !showForm && (
           <button
             onClick={() => { resetForm(); setShowForm(true); }}
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900"
+            className="rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600"
           >
             Add Field
           </button>
@@ -113,7 +113,7 @@ export default function FieldsPage({
             <button
               type="submit"
               disabled={create.isPending || update.isPending}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+              className="rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600 disabled:opacity-50"
             >
               {editId ? "Save" : "Add"}
             </button>

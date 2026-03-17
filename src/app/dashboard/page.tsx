@@ -30,7 +30,7 @@ export default async function DashboardPage() {
     <div className="space-y-16">
       {/* ── Active Tournaments ──────────────────────────────────── */}
       <section>
-        <h2 className="mb-1 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+        <h2 className="mb-1 border-l-2 border-violet-400 pl-3 text-xl font-semibold text-zinc-900 dark:border-violet-600 dark:text-zinc-50">
           Active Tournaments
         </h2>
         <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
@@ -57,19 +57,19 @@ export default async function DashboardPage() {
                 <div className="flex flex-col gap-2">
                   <Link
                     href={`/tournaments/${tournament.id}/leaderboard`}
-                    className="rounded-lg border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    className="rounded-lg border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-violet-300 hover:text-violet-700 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:text-violet-400"
                   >
                     See Scoreboard
                   </Link>
                   <Link
                     href={`/tournaments/${tournament.id}/schedule`}
-                    className="rounded-lg border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    className="rounded-lg border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-violet-300 hover:text-violet-700 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:text-violet-400"
                   >
                     See Schedule
                   </Link>
                   <Link
                     href={`/tournaments/${tournament.id}/apply`}
-                    className="rounded-lg bg-zinc-900 px-4 py-2 text-center text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                    className="rounded-lg bg-violet-700 px-4 py-2 text-center text-sm font-medium text-white hover:bg-violet-600"
                   >
                     Apply to Volunteer
                   </Link>
@@ -83,13 +83,13 @@ export default async function DashboardPage() {
       {/* ── My Tournaments ──────────────────────────────────────── */}
       <section>
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+          <h2 className="border-l-2 border-violet-400 pl-3 text-xl font-semibold text-zinc-900 dark:border-violet-600 dark:text-zinc-50">
             My Tournaments
           </h2>
           {session?.user && (
             <Link
               href="/dashboard/tournaments/new"
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600"
             >
               New Tournament
             </Link>
@@ -129,14 +129,14 @@ export default async function DashboardPage() {
                   href={`/dashboard/tournaments/${t.id}`}
                   className="group block"
                 >
-                  <p className="font-semibold text-zinc-900 underline-offset-4 group-hover:underline dark:text-zinc-50">
+                  <p className="font-semibold text-zinc-900 underline-offset-4 transition-colors group-hover:text-violet-700 dark:text-zinc-50 dark:group-hover:text-violet-400">
                     {t.name}
                   </p>
                   <p className="mt-1 text-xs text-zinc-500">
                     {t.competitionType?.name}
                   </p>
                 </Link>
-                <span className="mt-3 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                <span className="mt-3 inline-block rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-950/40 dark:text-violet-400">
                   {t.role}
                 </span>
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
@@ -155,7 +155,7 @@ export default async function DashboardPage() {
                     <Link
                       key={path}
                       href={`/dashboard/tournaments/${t.id}/${path}`}
-                      className="rounded-md bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                      className="rounded-md bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 transition-colors hover:bg-violet-100 hover:text-violet-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-violet-900/40 dark:hover:text-violet-400"
                     >
                       {label}
                     </Link>
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
 
       {/* ── Competition Types ────────────────────────────────────── */}
       <section>
-        <h2 className="mb-6 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+        <h2 className="mb-6 border-l-2 border-violet-400 pl-3 text-xl font-semibold text-zinc-900 dark:border-violet-600 dark:text-zinc-50">
           Competition Types
         </h2>
 

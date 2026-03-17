@@ -232,7 +232,7 @@ function TeamRow({
           height={h - 2}
           rx={5}
           fill="currentColor"
-          className="fill-green-50 dark:fill-green-900/20"
+          className="fill-violet-50 dark:fill-violet-900/20"
         />
       )}
       <text
@@ -241,7 +241,7 @@ function TeamRow({
         dominantBaseline="middle"
         fontSize={11}
         fill="currentColor"
-        className={isWinner ? "fill-green-700 dark:fill-green-400 font-semibold" : "fill-zinc-700 dark:fill-zinc-300"}
+        className={isWinner ? "fill-violet-700 dark:fill-violet-400 font-semibold" : "fill-zinc-700 dark:fill-zinc-300"}
       >
         {truncate(name, 18)}
       </text>
@@ -254,7 +254,7 @@ function TeamRow({
           fontSize={11}
           fontWeight={isWinner ? "bold" : "normal"}
           fill="currentColor"
-          className={isWinner ? "fill-green-700 dark:fill-green-400" : "fill-zinc-500 dark:fill-zinc-400"}
+          className={isWinner ? "fill-violet-700 dark:fill-violet-400" : "fill-zinc-500 dark:fill-zinc-400"}
         >
           {score}
         </text>

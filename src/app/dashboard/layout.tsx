@@ -17,14 +17,14 @@ export default async function DashboardLayout({
     : null;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-card">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link
             href="/dashboard"
-            className="text-sm font-semibold text-zinc-900 dark:text-zinc-50"
+            className="text-sm font-bold tracking-tight text-violet-600 dark:text-violet-400"
           >
-            Robotics Manager
+            Aeonix
           </Link>
           <UserDropdown
             userName={session?.user?.name ?? session?.user?.email ?? null}

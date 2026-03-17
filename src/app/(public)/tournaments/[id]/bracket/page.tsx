@@ -39,7 +39,7 @@ export default async function BracketPage({ params }: Props) {
         </div>
         <Link
           href={`/tournaments/${tournamentId}/leaderboard`}
-          className="text-sm text-zinc-500 underline-offset-4 hover:underline"
+          className="text-sm text-zinc-500 underline-offset-4 hover:underline hover:text-violet-700 dark:hover:text-violet-400"
         >
           Leaderboard →
         </Link>

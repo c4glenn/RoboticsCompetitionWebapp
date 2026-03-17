@@ -351,6 +351,9 @@ export const matchesRouter = router({
 
       const created: (typeof matches.$inferSelect)[] = [];
 
+      // Track each team's play count to derive round numbers
+      const teamPlayCount = new Map<string, number>(teamIds.map((t) => [t, 0]));
+
       for (let i = 0; i < pairings.length; i++) {
         const slotIndex = Math.floor(i / matchesPerSlot);
         const indexInSlot = i % matchesPerSlot;
@@ -367,19 +370,23 @@ export const matchesRouter = router({
         const fieldStart = indexInSlot * fieldsPerMatch;
         const matchFieldIds = fieldIds.slice(fieldStart, fieldStart + fieldsPerMatch);
 
+        const group = pairings[i];
+        const roundNumber = Math.max(...group.map((t) => teamPlayCount.get(t) ?? 0)) + 1;
+        group.forEach((t) => teamPlayCount.set(t, (teamPlayCount.get(t) ?? 0) + 1));
+
         const [match] = await ctx.db
           .insert(matches)
           .values({
             tournamentId: input.tournamentId,
             matchNumber: nextMatchNum++,
             matchType: "STANDARD",
+            roundNumber,
             scheduledAt: new Date(currentSlotTime),
           })
           .returning();
 
         created.push(match);
 
-        const group = pairings[i];
         for (let j = 0; j < group.length; j++) {
           const fieldId = matchFieldIds[Math.floor(j / teamsPerField)] ?? matchFieldIds[0];
           await ctx.db.insert(matchTeams).values({

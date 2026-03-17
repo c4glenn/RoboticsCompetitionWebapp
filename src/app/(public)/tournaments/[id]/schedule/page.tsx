@@ -49,7 +49,7 @@ export default async function SchedulePage({ params }: Props) {
         >
           ← Back
         </Link>
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-500">
           {tournament.name}
         </h1>
         <p className="mt-1 text-sm text-zinc-500">Match Schedule</p>

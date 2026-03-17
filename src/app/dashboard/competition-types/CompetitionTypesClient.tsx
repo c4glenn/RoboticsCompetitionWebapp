@@ -149,7 +149,7 @@ export function CompetitionTypesClient({
         {!showForm && (
           <button
             onClick={openAdd}
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600"
           >
             New Type
           </button>
@@ -265,7 +265,7 @@ export function CompetitionTypesClient({
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600 disabled:opacity-50"
             >
               {isPending ? "Saving…" : editId ? "Save Changes" : "Create"}
             </button>

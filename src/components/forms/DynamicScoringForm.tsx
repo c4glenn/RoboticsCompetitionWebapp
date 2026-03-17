@@ -57,7 +57,7 @@ export function DynamicScoringForm({
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+        className="rounded-lg bg-violet-700 px-5 py-2 text-sm font-medium text-white hover:bg-violet-600 disabled:opacity-50"
       >
         {isPending ? "Submitting…" : submitLabel}
       </button>

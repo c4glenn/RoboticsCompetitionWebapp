@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Robotics Competition Manager",
-  description: "Manage robotics competitions, teams, and scoring",
+  title: "Aeonix",
+  description: "Competition management for robotics tournaments",
 };
 
 export default function RootLayout({

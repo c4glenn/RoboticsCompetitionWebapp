@@ -271,7 +271,7 @@ export default function PracticeFieldsPage({
               <button
                 onClick={handleBookConfirm}
                 disabled={!selectedTeamId || bookMutation.isPending}
-                className="flex-1 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+                className="flex-1 rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
               >
                 {bookMutation.isPending ? "Booking…" : "Book"}
               </button>

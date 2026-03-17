@@ -98,7 +98,7 @@ export function LeaderboardStream({
         {hasElimination && (
           <Link
             href={`/tournaments/${tournamentId}/bracket`}
-            className="ml-auto rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="ml-auto rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors dark:border-zinc-700 dark:text-zinc-400 hover:bg-violet-700 dark:hover:bg-violet-900/20"
           >
             View Bracket →
           </Link>
@@ -108,14 +108,14 @@ export function LeaderboardStream({
       {inProgressMatches.length > 0 && (
         <div className="mb-3 space-y-2">
           {inProgressMatches.map((m) => (
-            <MatchBanner key={m.matchId} match={m} label="Now Playing" accent="blue" />
+            <MatchBanner key={m.matchId} match={m} label="Now Playing" accent="violet" />
           ))}
         </div>
       )}
 
       {nextMatch && (
         <div className="mb-3">
-          <MatchBanner match={nextMatch} label="Queuing Now" accent="amber" />
+          <MatchBanner match={nextMatch} label="Queuing Now" accent="purple" />
         </div>
       )}
 
@@ -194,20 +194,20 @@ function MatchBanner({
 }: {
   match: LiveMatch;
   label: string;
-  accent: "blue" | "amber";
+  accent: "violet" | "purple";
 }) {
   const colors = {
-    blue: {
-      border: "border-blue-200 dark:border-blue-800",
-      bg: "bg-blue-50 dark:bg-blue-950/40",
-      badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
-      dot: "bg-blue-400",
+    violet: {
+      border: "border-violet-200 dark:border-violet-800",
+      bg: "bg-violet-50 dark:bg-violet-950/40",
+      badge: "bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300",
+      dot: "bg-violet-400",
     },
-    amber: {
-      border: "border-amber-200 dark:border-amber-800",
-      bg: "bg-amber-50 dark:bg-amber-950/40",
-      badge: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
-      dot: "bg-amber-400",
+    purple: {
+      border: "border-purple-200 dark:border-purple-800",
+      bg: "bg-purple-50 dark:bg-purple-950/40",
+      badge: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300",
+      dot: "bg-purple-400",
     },
   }[accent];
 
@@ -248,7 +248,7 @@ function tabCls(active: boolean) {
   return [
     "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
     active
-      ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
+      ? "bg-violet-700 text-white"
       : "border border-zinc-300 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400",
   ].join(" ");
 }

@@ -128,7 +128,7 @@ export default function RefereeScorePage({
                       hasScore
                         ? "cursor-not-allowed bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                         : isSelected
-                        ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
+                        ? "bg-violet-700 text-white"
                         : "border border-zinc-300 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300",
                     ].join(" ")}
                   >

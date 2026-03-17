@@ -28,7 +28,7 @@ export function UserDropdown({
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-sm text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+        className="flex items-center gap-1.5 text-sm text-zinc-700 dark:text-zinc-300 hover:text-violet-700 dark:hover:text-violet-700"
       >
         {userName ?? "Guest"}
         <svg
@@ -51,7 +51,7 @@ export function UserDropdown({
             <form action={signOutAction}>
               <button
                 type="submit"
-                className="w-full px-3 py-2 text-left text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                className="w-full px-3 py-2 text-left text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-600"
               >
                 Log out
               </button>
@@ -60,7 +60,7 @@ export function UserDropdown({
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="block px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="block px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-600"
             >
               Log in
             </Link>

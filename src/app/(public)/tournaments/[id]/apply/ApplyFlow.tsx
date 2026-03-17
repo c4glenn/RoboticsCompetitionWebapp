@@ -136,7 +136,7 @@ export function ApplyFlow({ tournamentId, tournamentName, initialSession }: Prop
             <button
               onClick={handleDeviceMode}
               disabled={deviceLoading}
-              className="rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="rounded-lg bg-violet-700 px-4 py-3 text-sm font-medium text-white hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {deviceLoading ? "Setting up…" : "Use Device Mode"}
             </button>
@@ -222,7 +222,7 @@ export function ApplyFlow({ tournamentId, tournamentName, initialSession }: Prop
             <button
               type="submit"
               disabled={applyMutation.isPending}
-              className="w-full rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="w-full rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {applyMutation.isPending ? "Submitting…" : "Submit Application"}
             </button>

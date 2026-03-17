@@ -68,10 +68,10 @@ export default async function PracticePublicPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-500">
           {tournament.name}
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">Practice Field Availability</p>
+        <p className="mt-1 text-sm text-zinc-500">Practice Field Availability - Talk to a volunteer or your team lead to get a slot</p>
       </div>
 
       <PracticeFieldsStream tournamentId={tournamentId} initialData={initialData} />

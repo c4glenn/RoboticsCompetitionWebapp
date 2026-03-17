@@ -38,14 +38,14 @@ export function TeamDashboardPanel({
   return (
     <div className="mt-10 space-y-1">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          {canSelectTeam ? "Team Overview" : (data?.team.name ?? "My Team")}
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 ">
+          {canSelectTeam ? (data?.team.name ?? "Team Overview") : (data?.team.name ?? "My Team")}
         </h2>
         {canSelectTeam && (
           <select
             value={selectedTeamId}
             onChange={(e) => setSelectedTeamId(e.target.value)}
-            className={inputCls + " max-w-xs"}
+            className={inputCls + " max-w-xs hover:border-violet-700 dark:hover:border-violet-700"}
           >
             <option value="">Select a team…</option>
             {allTeams.map((t) => (
@@ -77,7 +77,7 @@ export function TeamDashboardPanel({
             <Section title="Current Ranking">
               {data.ranking ? (
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+                  <span className="text-3xl font-bold text-violet-700 dark:text-violet-500">
                     #{data.ranking.position}
                   </span>
                   <span className="text-sm text-zinc-400">
@@ -153,12 +153,12 @@ export function TeamDashboardPanel({
                   return (
                     <li
                       key={insp.id}
-                      className="rounded-lg border border-zinc-200 dark:border-zinc-700"
+                      className="rounded-lg group border border-zinc-200 dark:border-violet-500 group-hover:border-violet-700 dark:group-hover:border-violet-700"
                     >
                       <button
                         type="button"
                         onClick={() => toggleInspection(insp.id)}
-                        className="flex w-full items-center justify-between px-4 py-3 text-left"
+                        className="flex w-full items-center justify-between px-4 py-3 text-left "
                       >
                         <div className="flex items-center gap-3">
                           {insp.passed ? (
@@ -177,10 +177,10 @@ export function TeamDashboardPanel({
                             <span className="text-xs text-zinc-400">by {insp.inspector}</span>
                           )}
                         </div>
-                        <span className="text-zinc-400">{open ? "▲" : "▼"}</span>
+                        <span className="text-violet-700">{open ? "▲" : "▼"}</span>
                       </button>
                       {open && (
-                        <div className="border-t border-zinc-100 px-4 py-3 dark:border-zinc-700">
+                        <div className="border-t border-violet-700 px-4 py-3 dark:border-violet-500">
                           <InspectionReport
                             formData={insp.formData}
                             schema={data.inspectionFormSchema}
