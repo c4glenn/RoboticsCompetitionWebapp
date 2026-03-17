@@ -97,7 +97,7 @@ describe("users", () => {
     expect(user.email).toContain("@schema.test");
     expect(user.createdAt).toBeInstanceOf(Date);
     createdIds.userId = user.id;
-    createdIds.userEmail = user.email;
+    createdIds.userEmail = user.email ?? undefined;
   });
 
   it("enforces unique email constraint", async () => {
@@ -187,7 +187,6 @@ describe("matches and scores", () => {
       .insert(schema.matches)
       .values({
         tournamentId: createdIds.tournamentId!,
-        fieldId: createdIds.fieldId!,
         matchType: "STANDARD",
         status: "PENDING",
       })

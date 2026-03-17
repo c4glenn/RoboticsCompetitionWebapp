@@ -43,21 +43,43 @@ export default async function DashboardPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tournaments.map((t) => (
-            <Link
+            <div
               key={t.id}
-              href={`/dashboard/tournaments/${t.id}`}
-              className="rounded-xl border border-zinc-200 bg-white p-5 transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+              className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900"
             >
-              <p className="font-semibold text-zinc-900 dark:text-zinc-50">
-                {t.name}
-              </p>
-              <p className="mt-1 text-xs text-zinc-500">
-                {t.competitionType?.name}
-              </p>
+              <Link href={`/dashboard/tournaments/${t.id}`} className="group block">
+                <p className="font-semibold text-zinc-900 group-hover:underline underline-offset-4 dark:text-zinc-50">
+                  {t.name}
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {t.competitionType?.name}
+                </p>
+              </Link>
               <span className="mt-3 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                 {t.role}
               </span>
-            </Link>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+                {[
+                  { label: "Teams", path: "teams" },
+                  { label: "Matches", path: "matches" },
+                  { label: "Fields", path: "fields" },
+                  ...(t.role === "DIRECTOR"
+                    ? [
+                        { label: "Settings", path: "settings" },
+                        { label: "Volunteers", path: "volunteers" },
+                      ]
+                    : []),
+                ].map(({ label, path }) => (
+                  <Link
+                    key={path}
+                    href={`/dashboard/tournaments/${t.id}/${path}`}
+                    className="rounded-md bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       )}

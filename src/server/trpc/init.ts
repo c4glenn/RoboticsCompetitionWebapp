@@ -48,3 +48,19 @@ export async function assertDirector(
     });
   }
 }
+
+/**
+ * Asserts that the user is a DIRECTOR or CHECK_IN_TABLE for the given tournament.
+ */
+export async function assertDirectorOrCheckIn(
+  userId: string,
+  tournamentId: string
+): Promise<void> {
+  const ok = await hasRole(userId, tournamentId, "DIRECTOR", "CHECK_IN_TABLE");
+  if (!ok) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Only directors or check-in table staff can perform this action.",
+    });
+  }
+}

@@ -8,12 +8,75 @@
       "when": 1773626260689,
       "tag": "0000_famous_hellfire_club",
       "breakpoints": true
-    }
-    ,{
+    },
+    {
       "idx": 1,
       "version": "7",
       "when": 1742083200000,
       "tag": "0001_tournament_match_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773709080728,
+      "tag": "0002_colorful_zarda",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773709568817,
+      "tag": "0003_lively_kat_farrell",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1773712391364,
+      "tag": "0004_optimal_the_initiative",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773713028921,
+      "tag": "0005_purple_calypso",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1773713459830,
+      "tag": "0006_lumpy_gressill",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1773714326090,
+      "tag": "0007_faulty_shinko_yamashiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1773714669406,
+      "tag": "0008_stale_killer_shrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1773792000000,
+      "tag": "0009_show_judging_scores",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1773793000000,
+      "tag": "0010_match_duration",
       "breakpoints": true
     }
   ]

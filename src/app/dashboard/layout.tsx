@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { auth } from "@/server/auth";
+import { auth, signOut } from "@/server/auth";
 import { redirect } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function DashboardLayout({
   children,
@@ -22,7 +23,13 @@ export default async function DashboardLayout({
           </Link>
           <div className="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400">
             <span>{session.user.name ?? session.user.email}</span>
-            <form action="/api/auth/signout" method="POST">
+            <ThemeToggle />
+            <form
+              action={async () => {
+                "use server";
+                await signOut();
+              }}
+            >
               <button
                 type="submit"
                 className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"

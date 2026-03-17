@@ -8,6 +8,7 @@ export const roleEnum = pgEnum("role", [
   "JUDGE",
   "TEAM_LEAD",
   "VOLUNTEER",
+  "CHECK_IN_TABLE",
 ]);
 
 export const userTournamentRoles = pgTable(

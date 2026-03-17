@@ -224,7 +224,6 @@ async function seed() {
       .insert(schema.matches)
       .values({
         tournamentId: tournament.id,
-        fieldId: field.id,
         matchType: "STANDARD",
         roundNumber: Math.floor(i / 2) + 1,
         status: "PENDING",
@@ -232,8 +231,8 @@ async function seed() {
       .returning();
 
     await db.insert(schema.matchTeams).values([
-      { matchId: match.id, teamId: allTeams[aIdx].id, side: "HOME" },
-      { matchId: match.id, teamId: allTeams[bIdx].id, side: "AWAY" },
+      { matchId: match.id, teamId: allTeams[aIdx].id, side: "HOME", fieldId: field.id },
+      { matchId: match.id, teamId: allTeams[bIdx].id, side: "AWAY", fieldId: field.id },
     ]);
   }
 

@@ -27,6 +27,10 @@ export default function RefereeScorePage({
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const startMatch = trpc.scoring.startMatch.useMutation({
+    onSuccess: () => refetch(),
+  });
+
   const submitScore = trpc.scoring.submitMatchScore.useMutation({
     onSuccess: (score) => {
       setSuccessMsg(`Score submitted: ${score.calculatedScore} pts`);
@@ -64,23 +68,37 @@ export default function RefereeScorePage({
         <select
           value={selectedMatchId ?? ""}
           onChange={(e) => {
-            setSelectedMatchId(e.target.value || null);
+            const matchId = e.target.value || null;
+            setSelectedMatchId(matchId);
             setSelectedTeamId(null);
             setSuccessMsg(null);
             setError(null);
+            if (matchId) {
+              startMatch.mutate({ matchId, tournamentId });
+            }
           }}
           className={inputCls}
         >
           <option value="">— choose a match —</option>
           {isLoading && <option disabled>Loading…</option>}
-          {matchList?.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.field?.name ? `[${m.field.name}] ` : ""}
-              Match —{" "}
-              {m.matchTeams.map((mt) => mt.team.name).join(" vs ")}
-              {m.status === "COMPLETE" ? " ✓" : ""}
-            </option>
-          ))}
+          {matchList?.map((m) => {
+            const isElim = m.matchType === "ELIMINATION";
+            const fieldNames = [
+              ...new Set(m.matchTeams.map((mt) => mt.field?.name).filter(Boolean)),
+            ].join("/");
+            const matchLabel = m.matchNumber != null ? `#${m.matchNumber}` : "";
+            const prefix = isElim
+              ? `[Elim${m.roundNumber ? ` R${m.roundNumber}` : ""}${m.bracketPosition ? ` · ${m.bracketPosition}` : ""}] ${matchLabel}`
+              : `Match ${matchLabel}`;
+            return (
+              <option key={m.id} value={m.id}>
+                {prefix.trim()}
+                {fieldNames ? ` [${fieldNames}]` : ""}
+                {m.matchTeams.length > 0 ? ` — ${m.matchTeams.map((mt) => mt.team.name).join(" vs ")}` : ""}
+                {m.status === "COMPLETE" ? " ✓" : ""}
+              </option>
+            );
+          })}
         </select>
       </div>
 

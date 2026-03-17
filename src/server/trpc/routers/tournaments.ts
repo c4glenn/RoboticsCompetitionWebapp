@@ -15,6 +15,15 @@ import {
 import type { ScoreAggregation } from "@/db/schema";
 
 export const tournamentsRouter = router({
+  /** Public — all tournaments marked as active. */
+  listActive: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.query.tournaments.findMany({
+      where: eq(tournaments.isActive, true),
+      with: { competitionType: true },
+      orderBy: (t, { desc }) => [desc(t.createdAt)],
+    });
+  }),
+
   /** All tournaments where the current user has any role. */
   list: protectedProcedure.query(async ({ ctx }) => {
     const rows = await ctx.db.query.userTournamentRoles.findMany({
@@ -127,6 +136,40 @@ export const tournamentsRouter = router({
         .where(eq(tournamentClasses.id, input.classId));
     }),
 
+  /** Toggle tournament public visibility. Director only. */
+  toggleActive: protectedProcedure
+    .input(z.object({ id: z.string(), isActive: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      await assertDirector(ctx.user.id, input.id);
+      const [updated] = await ctx.db
+        .update(tournaments)
+        .set({ isActive: input.isActive })
+        .where(eq(tournaments.id, input.id))
+        .returning();
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND" });
+      return updated;
+    }),
+
+  /** Update the per-tournament side labels. Director only. */
+  updateMatchSides: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        /** Pass null to disable sides entirely, or an array of label strings. */
+        matchSides: z.array(z.string().min(1).max(50)).nullable(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertDirector(ctx.user.id, input.id);
+      const [updated] = await ctx.db
+        .update(tournaments)
+        .set({ matchSides: input.matchSides })
+        .where(eq(tournaments.id, input.id))
+        .returning();
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND" });
+      return updated;
+    }),
+
   /** Update match scheduling settings. Director only. */
   updateSettings: protectedProcedure
     .input(
@@ -139,6 +182,7 @@ export const tournamentsRouter = router({
             n: z.number().int().min(1).max(20).optional(),
           })
           .optional(),
+        showJudgingScores: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -153,11 +197,14 @@ export const tournamentsRouter = router({
       const updateData: {
         matchesPerTeam?: number;
         scoreAggregation?: ScoreAggregation;
+        showJudgingScores?: boolean;
       } = {};
       if (data.matchesPerTeam !== undefined)
         updateData.matchesPerTeam = data.matchesPerTeam;
       if (data.scoreAggregation !== undefined)
         updateData.scoreAggregation = data.scoreAggregation;
+      if (data.showJudgingScores !== undefined)
+        updateData.showJudgingScores = data.showJudgingScores;
 
       const [updated] = await ctx.db
         .update(tournaments)

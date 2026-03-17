@@ -5,4 +5,5 @@ export * from "./teams";
 export * from "./roles";
 export * from "./matches";
 export * from "./scores";
+export * from "./volunteerApplications";
 export * from "./relations";

@@ -1,0 +1,1 @@
+ALTER TABLE "volunteer_applications" ADD COLUMN "requested_role" "role" DEFAULT 'VOLUNTEER' NOT NULL;

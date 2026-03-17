@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, jsonb, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, jsonb, integer, boolean } from "drizzle-orm/pg-core";
 
 // ── JSON shape types ──────────────────────────────────────────────────────────
 
@@ -56,6 +56,8 @@ export const competitionTypes = pgTable("competition_types", {
     .notNull(),
   judgingFormSchema: jsonb("judging_form_schema").$type<FormSchema>(),
   scoringLogic: jsonb("scoring_logic").$type<ScoringLogic>().notNull(),
+  /** Duration of a single match in minutes (used for schedule generation). */
+  matchDurationMinutes: integer("match_duration_minutes").notNull().default(5),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -73,6 +75,14 @@ export const tournaments = pgTable("tournaments", {
     .$type<ScoreAggregation>()
     .notNull()
     .default({ method: "best_n", n: 2 }),
+  /**
+   * Labels for team slots within a match (e.g. ["HOME", "AWAY"] or ["Red", "Blue"]).
+   * Null means this tournament doesn't use sides.
+   */
+  matchSides: jsonb("match_sides").$type<string[]>(),
+  /** Show judging scores on the public leaderboard (requires competitionType.judgingFormSchema). */
+  showJudgingScores: boolean("show_judging_scores").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

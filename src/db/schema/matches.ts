@@ -20,16 +20,13 @@ export const matchStatusEnum = pgEnum("match_status", [
   "CANCELLED",
 ]);
 
-export const matchSideEnum = pgEnum("match_side", ["HOME", "AWAY"]);
-
 export const matches = pgTable("matches", {
   id: uuid("id").primaryKey().defaultRandom(),
   tournamentId: uuid("tournament_id")
     .notNull()
     .references(() => tournaments.id, { onDelete: "cascade" }),
-  fieldId: uuid("field_id").references(() => fields.id, {
-    onDelete: "set null",
-  }),
+  /** Sequential match identifier within the tournament (e.g. 1, 2, 3…). */
+  matchNumber: integer("match_number"),
   matchType: matchTypeEnum("match_type").notNull().default("STANDARD"),
   roundNumber: integer("round_number"),
   bracketPosition: text("bracket_position"),
@@ -47,7 +44,11 @@ export const matchTeams = pgTable(
     teamId: uuid("team_id")
       .notNull()
       .references(() => teams.id, { onDelete: "cascade" }),
-    side: matchSideEnum("side"),
+    side: text("side"),
+    /** The field this team runs on for this match (may differ per team). */
+    fieldId: uuid("field_id").references(() => fields.id, {
+      onDelete: "set null",
+    }),
   },
   (t) => [primaryKey({ columns: [t.matchId, t.teamId] })]
 );

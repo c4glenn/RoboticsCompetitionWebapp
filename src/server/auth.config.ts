@@ -28,7 +28,9 @@ export const authConfig: NextAuthConfig = {
       }
 
       if (isAuthPage && isLoggedIn) {
-        return Response.redirect(new URL("/dashboard", nextUrl));
+        const cb = nextUrl.searchParams.get("callbackUrl");
+        const safe = cb?.startsWith("/") ? cb : "/dashboard";
+        return Response.redirect(new URL(safe, nextUrl));
       }
 
       return true;

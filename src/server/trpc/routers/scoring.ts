@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../init";
 import {
@@ -66,18 +66,32 @@ export const scoringRouter = router({
       return ctx.db.query.matches.findMany({
         where: eq(matches.tournamentId, input.tournamentId),
         with: {
-          matchTeams: { with: { team: true } },
+          matchTeams: { with: { team: true, field: true } },
           scores: true,
-          field: true,
         },
         orderBy: (m, { asc }) => [asc(m.scheduledAt)],
       });
     }),
 
   /**
+   * Move a match to IN_PROGRESS if it is currently PENDING.
+   * Idempotent — no-ops on any other status.
+   */
+  startMatch: protectedProcedure
+    .input(z.object({ matchId: z.string(), tournamentId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await assertReferee(ctx.user.id, input.tournamentId);
+      await ctx.db
+        .update(matches)
+        .set({ status: "IN_PROGRESS" })
+        .where(and(eq(matches.id, input.matchId), eq(matches.status, "PENDING")));
+    }),
+
+  /**
    * Submit a score for one team in a match.
    * Prevents duplicates — if a score already exists for (matchId, teamId)
    * this throws CONFLICT before hitting the DB unique constraint.
+   * After inserting, auto-completes the match if every assigned team now has a score.
    */
   submitMatchScore: protectedProcedure
     .input(
@@ -145,6 +159,72 @@ export const scoringRouter = router({
           notes: input.notes,
         })
         .returning();
+
+      // Auto-complete: if every assigned team now has a score, mark the match COMPLETE.
+      const [{ teamCount }] = await ctx.db
+        .select({ teamCount: count() })
+        .from(matchTeams)
+        .where(eq(matchTeams.matchId, input.matchId));
+
+      const [{ scoreCount }] = await ctx.db
+        .select({ scoreCount: count() })
+        .from(scores)
+        .where(eq(scores.matchId, input.matchId));
+
+      if (teamCount > 0 && scoreCount >= teamCount) {
+        const [completedMatch] = await ctx.db
+          .update(matches)
+          .set({ status: "COMPLETE", completedAt: new Date() })
+          .where(and(eq(matches.id, input.matchId), eq(matches.status, "IN_PROGRESS")))
+          .returning();
+
+        // Auto-advance winner for elimination matches
+        if (
+          completedMatch?.matchType === "ELIMINATION" &&
+          completedMatch.roundNumber &&
+          completedMatch.bracketPosition
+        ) {
+          const allScores = await ctx.db
+            .select({ teamId: scores.teamId, calculatedScore: scores.calculatedScore })
+            .from(scores)
+            .where(eq(scores.matchId, input.matchId));
+
+          if (allScores.length > 0) {
+            const winner = allScores.reduce((best, s) =>
+              (s.calculatedScore ?? 0) > (best.calculatedScore ?? 0) ? s : best
+            );
+
+            const currentPos = parseInt(completedMatch.bracketPosition.split("-")[1], 10);
+            const nextBracketPosition = `${completedMatch.roundNumber + 1}-${Math.ceil(currentPos / 2)}`;
+
+            const [nextMatch, currentTeam] = await Promise.all([
+              ctx.db.query.matches.findFirst({
+                where: and(
+                  eq(matches.tournamentId, input.tournamentId),
+                  eq(matches.bracketPosition, nextBracketPosition),
+                  eq(matches.matchType, "ELIMINATION")
+                ),
+                with: { matchTeams: true },
+              }),
+              ctx.db.query.matchTeams.findFirst({
+                where: eq(matchTeams.matchId, input.matchId),
+              }),
+            ]);
+
+            if (nextMatch) {
+              const side = nextMatch.matchTeams.length === 0 ? "HOME" : "AWAY";
+              await ctx.db
+                .insert(matchTeams)
+                .values({
+                  matchId: nextMatch.id,
+                  teamId: winner.teamId,
+                  side,
+                  fieldId: currentTeam?.fieldId ?? undefined,
+                });
+            }
+          }
+        }
+      }
 
       return score;
     }),

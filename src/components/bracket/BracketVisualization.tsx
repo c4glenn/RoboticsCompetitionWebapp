@@ -69,7 +69,7 @@ export function BracketVisualization({ matches }: Props) {
 
   // SVG dimensions
   const svgW = totalRounds * (CARD_W + ROUND_GAP) - ROUND_GAP + 20;
-  const svgH = round1SlotCount * (CARD_H + SLOT_GAP);
+  const svgH = round1SlotCount * (CARD_H + SLOT_GAP) + 40;
 
   // Round labels
   const roundLabels: string[] = [];

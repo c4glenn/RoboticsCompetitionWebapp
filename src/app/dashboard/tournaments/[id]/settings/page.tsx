@@ -33,16 +33,23 @@ export default function SettingsPage({
   const [matchesPerTeam, setMatchesPerTeam] = useState<string>("");
   const [aggMethod, setAggMethod] = useState<ScoreAggregationMethod>("best_n");
   const [aggN, setAggN] = useState<string>("2");
+  const [showJudgingScores, setShowJudgingScores] = useState(false);
 
   useEffect(() => {
     if (tournament) {
       setMatchesPerTeam(String(tournament.matchesPerTeam ?? 3));
       setAggMethod((tournament.scoreAggregation?.method ?? "best_n") as ScoreAggregationMethod);
       setAggN(String(tournament.scoreAggregation?.n ?? 2));
+      setShowJudgingScores(tournament.showJudgingScores ?? false);
     }
   }, [tournament]);
 
   const updateSettings = trpc.tournaments.updateSettings.useMutation({
+    onSuccess: () => refetchTournament(),
+  });
+
+  // --- Tournament visibility ---
+  const toggleActive = trpc.tournaments.toggleActive.useMutation({
     onSuccess: () => refetchTournament(),
   });
 
@@ -54,6 +61,27 @@ export default function SettingsPage({
   const removeClass = trpc.tournaments.removeClass.useMutation({
     onSuccess: () => refetchTournament(),
   });
+
+  // --- Match sides ---
+  const [sides, setSides] = useState<string[]>([]);
+  const [newSide, setNewSide] = useState("");
+  const [editingSideIdx, setEditingSideIdx] = useState<number | null>(null);
+  const [editingSideValue, setEditingSideValue] = useState("");
+
+  useEffect(() => {
+    if (tournament) {
+      setSides(tournament.matchSides ?? []);
+    }
+  }, [tournament]);
+
+  const updateMatchSides = trpc.tournaments.updateMatchSides.useMutation({
+    onSuccess: () => refetchTournament(),
+  });
+
+  function saveSides(next: string[]) {
+    setSides(next);
+    updateMatchSides.mutate({ id: tournamentId, matchSides: next.length > 0 ? next : null });
+  }
 
   // --- Role assignment ---
   const [roleEmail, setRoleEmail] = useState("");
@@ -145,6 +173,46 @@ export default function SettingsPage({
         )}
       </section>
 
+      {/* Tournament visibility */}
+      {isDirector && (
+        <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="mb-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            Tournament Visibility
+          </h2>
+          <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+            Active tournaments appear on the public home page where anyone can
+            view the scoreboard, schedule, and apply to volunteer.
+          </p>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-zinc-700 dark:text-zinc-300">
+              {tournament?.isActive ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
+                  Active — publicly visible
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-zinc-400" />
+                  Inactive — hidden from public
+                </span>
+              )}
+            </span>
+            <button
+              onClick={() =>
+                toggleActive.mutate({
+                  id: tournamentId,
+                  isActive: !tournament?.isActive,
+                })
+              }
+              disabled={toggleActive.isPending}
+              className={btnSecondary + " disabled:opacity-50"}
+            >
+              {tournament?.isActive ? "Deactivate" : "Activate"}
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Classes */}
       <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
         <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
@@ -185,6 +253,90 @@ export default function SettingsPage({
         )}
       </section>
 
+      {/* Match sides */}
+      {isDirector && (
+        <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="mb-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            Match Sides
+          </h2>
+          <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+            Labels assigned to each team slot in a match (e.g. Home / Away, Red / Blue). Leave empty to use no sides.
+          </p>
+          <ul className="mb-3 space-y-1">
+            {sides.map((side, idx) => (
+              <li key={idx} className="flex items-center gap-2 text-sm">
+                {editingSideIdx === idx ? (
+                  <>
+                    <input
+                      autoFocus
+                      value={editingSideValue}
+                      onChange={(e) => setEditingSideValue(e.target.value)}
+                      className={inputCls + " flex-1"}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          const next = sides.map((s, i) => (i === idx ? editingSideValue.trim() : s)).filter(Boolean);
+                          saveSides(next);
+                          setEditingSideIdx(null);
+                        } else if (e.key === "Escape") {
+                          setEditingSideIdx(null);
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        const next = sides.map((s, i) => (i === idx ? editingSideValue.trim() : s)).filter(Boolean);
+                        saveSides(next);
+                        setEditingSideIdx(null);
+                      }}
+                      className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
+                    >
+                      Save
+                    </button>
+                    <button onClick={() => setEditingSideIdx(null)} className="text-xs text-zinc-400">
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="flex-1 text-zinc-700 dark:text-zinc-300">{side}</span>
+                    <button
+                      onClick={() => { setEditingSideIdx(idx); setEditingSideValue(side); }}
+                      className="text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => saveSides(sides.filter((_, i) => i !== idx))}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const trimmed = newSide.trim();
+              if (!trimmed) return;
+              saveSides([...sides, trimmed]);
+              setNewSide("");
+            }}
+            className="flex gap-2"
+          >
+            <input
+              value={newSide}
+              onChange={(e) => setNewSide(e.target.value)}
+              placeholder="Add side label…"
+              className={inputCls + " flex-1"}
+            />
+            <button type="submit" className={btnPrimary}>Add</button>
+          </form>
+        </section>
+      )}
+
       {/* Match settings */}
       {isDirector && (
         <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
@@ -201,6 +353,7 @@ export default function SettingsPage({
                   method: aggMethod,
                   n: aggMethod === "best_n" ? parseInt(aggN) : undefined,
                 },
+                showJudgingScores,
               });
             }}
             className="space-y-4"
@@ -263,6 +416,37 @@ export default function SettingsPage({
                 ? "Teams' leaderboard score is the average of all their match scores."
                 : "Teams' leaderboard score is the sum of all their match scores."}
             </p>
+            {tournament?.competitionType?.judgingFormSchema && (
+              <div className="flex items-center justify-between rounded-lg border border-zinc-200 px-3 py-2.5 dark:border-zinc-700">
+                <div>
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Show judging scores on public leaderboard
+                  </p>
+                  <p className="text-xs text-zinc-400">
+                    Displays a judging column and includes judging in the final score.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showJudgingScores}
+                  onClick={() => setShowJudgingScores(!showJudgingScores)}
+                  className={[
+                    "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none",
+                    showJudgingScores
+                      ? "bg-zinc-900 dark:bg-zinc-50"
+                      : "bg-zinc-200 dark:bg-zinc-700",
+                  ].join(" ")}
+                >
+                  <span
+                    className={[
+                      "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transition-transform dark:bg-zinc-900",
+                      showJudgingScores ? "translate-x-5" : "translate-x-0",
+                    ].join(" ")}
+                  />
+                </button>
+              </div>
+            )}
             <button
               type="submit"
               disabled={updateSettings.isPending}
