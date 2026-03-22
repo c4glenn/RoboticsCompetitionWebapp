@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, isNotNull } from "drizzle-orm";
 import { router, protectedProcedure, assertDirector } from "../init";
-import { userTournamentRoles } from "@/db/schema";
+import { userTournamentRoles, teams } from "@/db/schema";
 import { sendEmail } from "@/lib/email";
 
 export const emailRouter = router({
@@ -42,6 +42,30 @@ export const emailRouter = router({
           text: input.body,
         });
         sent++;
+      }
+
+      // For TEAM_LEAD, also email teams that have a teamLeadEmail but no linked account
+      if (input.role === "TEAM_LEAD") {
+        const accountlessTeams = await ctx.db
+          .select({ teamLeadEmail: teams.teamLeadEmail, name: teams.name })
+          .from(teams)
+          .where(
+            and(
+              eq(teams.tournamentId, input.tournamentId),
+              isNull(teams.teamLeadUserId),
+              isNotNull(teams.teamLeadEmail)
+            )
+          );
+
+        for (const team of accountlessTeams) {
+          await sendEmail({
+            to: team.teamLeadEmail!,
+            toName: team.name,
+            subject: input.subject,
+            text: input.body,
+          });
+          sent++;
+        }
       }
 
       return { sent, skipped };
