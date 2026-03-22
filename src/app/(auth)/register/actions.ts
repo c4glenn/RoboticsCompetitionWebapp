@@ -29,7 +29,8 @@ export async function registerUser(
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, password } = parsed.data;
+  const email = parsed.data.email.toLowerCase();
 
   const existing = await db.query.users.findFirst({
     where: eq(users.email, email),

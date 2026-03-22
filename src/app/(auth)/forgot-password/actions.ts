@@ -8,7 +8,8 @@ import { sendEmail } from "@/lib/email";
 
 export type ForgotPasswordResult = { success: true } | { success: false; error: string };
 
-export async function requestPasswordReset(email: string): Promise<ForgotPasswordResult> {
+export async function requestPasswordReset(rawEmail: string): Promise<ForgotPasswordResult> {
+  const email = rawEmail.toLowerCase();
   const user = await db.query.users.findFirst({
     where: eq(users.email, email),
   });

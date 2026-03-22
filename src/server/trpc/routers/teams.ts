@@ -64,7 +64,10 @@ export const teamsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       await assertDirector(ctx.user.id, input.tournamentId);
-      const [team] = await ctx.db.insert(teams).values(input).returning();
+      const [team] = await ctx.db.insert(teams).values({
+        ...input,
+        teamLeadEmail: input.teamLeadEmail?.toLowerCase(),
+      }).returning();
       return team;
     }),
 
@@ -89,6 +92,8 @@ export const teamsRouter = router({
         where: eq(teams.id, id),
       });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (data.teamLeadEmail) data.teamLeadEmail = data.teamLeadEmail.toLowerCase();
 
       const [updated] = await ctx.db
         .update(teams)
@@ -122,7 +127,11 @@ export const teamsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       await assertDirector(ctx.user.id, input.tournamentId);
-      const rows = input.teams.map((t) => ({ ...t, tournamentId: input.tournamentId }));
+      const rows = input.teams.map((t) => ({
+        ...t,
+        tournamentId: input.tournamentId,
+        teamLeadEmail: t.teamLeadEmail?.toLowerCase(),
+      }));
       const inserted = await ctx.db.insert(teams).values(rows).returning();
       return inserted;
     }),
