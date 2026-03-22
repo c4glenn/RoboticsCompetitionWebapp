@@ -79,12 +79,19 @@ export default function SendEmailForm({ tournamentId }: { tournamentId: string }
       </div>
 
       <div className="space-y-1.5">
-        <label
-          htmlFor="body"
-          className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-        >
-          Message
-        </label>
+        <div className="flex items-baseline justify-between">
+          <label
+            htmlFor="body"
+            className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          >
+            Message
+          </label>
+          <span className="text-xs text-zinc-400 dark:text-zinc-500">
+            {role === "TEAM_LEAD"
+              ? "{{Name}}, {{TeamName}}, {{Org}}, {{PitNumber}}, {{TournamentLink}}, {{AppUrl}}"
+              : "{{Name}}, {{TournamentLink}}, {{AppUrl}}"}
+          </span>
+        </div>
         <textarea
           id="body"
           required
