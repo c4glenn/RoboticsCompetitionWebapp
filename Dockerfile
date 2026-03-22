@@ -17,7 +17,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm build
-RUN node_modules/.bin/esbuild src/db/migrate.ts --bundle --platform=node --outfile=migrate.js
+RUN pnpm exec tsc --project tsconfig.migrate.json
 
 # Stage 4: runner — minimal production image
 FROM node:22-alpine AS runner
@@ -34,7 +34,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Copy migration script and SQL migration files
-COPY --from=builder --chown=nextjs:nodejs /app/migrate.js ./migrate.js
+COPY --from=builder --chown=nextjs:nodejs /app/dist-migrate/migrate.js ./migrate.js
 COPY --from=builder --chown=nextjs:nodejs /app/src/db/migrations ./src/db/migrations
 
 # Copy and set up entrypoint
