@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { and, eq, isNull, isNotNull } from "drizzle-orm";
 import { router, protectedProcedure, assertDirector } from "../init";
-import { userTournamentRoles, teams } from "@/db/schema";
+import { userTournamentRoles, teams, tournamentClasses } from "@/db/schema";
 import { sendEmail } from "@/lib/email";
 
 function applyTemplate(template: string, vars: Record<string, string>): string {
@@ -37,7 +37,7 @@ export const emailRouter = router({
       });
 
       // Build userId -> team info map so we can populate team vars for team leads with accounts
-      type TeamVars = { name: string; schoolOrOrg: string | null; pitNumber: number | null };
+      type TeamVars = { name: string; schoolOrOrg: string | null; pitNumber: number | null; className: string | null };
       let teamByUserId = new Map<string, TeamVars>();
       if (input.role === "TEAM_LEAD") {
         const teamRows = await ctx.db
@@ -46,8 +46,10 @@ export const emailRouter = router({
             name: teams.name,
             schoolOrOrg: teams.schoolOrOrg,
             pitNumber: teams.pitNumber,
+            className: tournamentClasses.name,
           })
           .from(teams)
+          .leftJoin(tournamentClasses, eq(tournamentClasses.id, teams.classId))
           .where(
             and(eq(teams.tournamentId, input.tournamentId), isNotNull(teams.teamLeadUserId))
           );
@@ -71,6 +73,7 @@ export const emailRouter = router({
           vars.TeamName = team.name;
           if (team.schoolOrOrg) vars.Org = team.schoolOrOrg;
           if (team.pitNumber != null) vars.PitNumber = String(team.pitNumber);
+          if (team.className) vars.Class = team.className;
         }
         await sendEmail({
           to: user.email,
@@ -89,8 +92,10 @@ export const emailRouter = router({
             name: teams.name,
             schoolOrOrg: teams.schoolOrOrg,
             pitNumber: teams.pitNumber,
+            className: tournamentClasses.name,
           })
           .from(teams)
+          .leftJoin(tournamentClasses, eq(tournamentClasses.id, teams.classId))
           .where(
             and(
               eq(teams.tournamentId, input.tournamentId),
@@ -103,6 +108,7 @@ export const emailRouter = router({
           const vars: Record<string, string> = { ...globalVars, Name: team.name, TeamName: team.name };
           if (team.schoolOrOrg) vars.Org = team.schoolOrOrg;
           if (team.pitNumber != null) vars.PitNumber = String(team.pitNumber);
+          if (team.className) vars.Class = team.className;
           await sendEmail({
             to: team.teamLeadEmail!,
             toName: team.name,

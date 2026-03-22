@@ -88,7 +88,7 @@ export default function SendEmailForm({ tournamentId }: { tournamentId: string }
           </label>
           <span className="text-xs text-zinc-400 dark:text-zinc-500">
             {role === "TEAM_LEAD"
-              ? "{{Name}}, {{TeamName}}, {{Org}}, {{PitNumber}}, {{TournamentLink}}, {{AppUrl}}"
+              ? "{{Name}}, {{TeamName}}, {{Class}}, {{Org}}, {{PitNumber}}, {{TournamentLink}}, {{AppUrl}}"
               : "{{Name}}, {{TournamentLink}}, {{AppUrl}}"}
           </span>
         </div>
