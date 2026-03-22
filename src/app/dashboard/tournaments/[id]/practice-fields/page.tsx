@@ -172,7 +172,7 @@ export default function PracticeFieldsPage({
     setBookError(null);
     if (hasMyTeam) {
       setSubmittingKey(slotKey(fieldId, startTime));
-      bookMutation.mutate({ tournamentId, fieldId, startTime });
+      bookMutation.mutate({ tournamentId, fieldId, startTime, teamId: myTeam!.id });
     } else {
       setPendingBook({ fieldId, startTime });
     }
