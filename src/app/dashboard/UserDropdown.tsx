@@ -47,6 +47,20 @@ export function UserDropdown({
           <div className="border-b border-zinc-100 px-3 py-2 dark:border-zinc-800">
             <ThemeToggle />
           </div>
+          <Link
+            href="/dashboard/tournaments/new"
+            onClick={() => setOpen(false)}
+            className="block px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-600"
+          >
+            New Tournament
+          </Link>
+          <Link
+            href="/dashboard/competition-types"
+            onClick={() => setOpen(false)}
+            className="block px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-600"
+          >
+            Competition Types
+          </Link>
           {signOutAction ? (
             <form action={signOutAction}>
               <button

@@ -37,6 +37,8 @@ export default async function TournamentPage({
   const canInspectOrReferee = isDirector || userRole?.role === "REFEREE";
   const canJudge = isDirector || userRole?.role === "JUDGE";
   const isTeamLead = userRole?.role === "TEAM_LEAD";
+
+  const canBookSlot = isDirector || isTeamLead ||  userRole?.role === "VOLUNTEER";
   const canViewAnyTeam =
     isDirector ||
     userRole?.role === "VOLUNTEER" ||
@@ -78,14 +80,14 @@ export default async function TournamentPage({
 
         </div>
       </div>
-
       <div className="mb-4 flex flex-wrap gap-2">
         {canInspectOrReferee && <QuickLink href={`/inspect/${id}`} label="Inspection" />}
         {canInspectOrReferee && <QuickLink href={`/referee/${id}/score`} label="Referee" />}
         {canJudge && <QuickLink href={`/judge/${id}/score`} label="Judge" />}
-        <QuickLink href={`/tournaments/${id}/leaderboard`} label="Scoreboard" external />
-        <QuickLink href={`/tournaments/${id}/schedule`} label="Schedule" external/>
-        <QuickLink href={`/tournaments/${id}/practice`} label="Practice Fields" external />
+        {canBookSlot && <QuickLink href={`/dashboard/tournaments/${id}/practice-fields`} label="Book Practice Fields"/>}
+        <QuickLink href={`/tournaments/${id}/leaderboard`} label="View Scoreboard" external />
+        <QuickLink href={`/tournaments/${id}/schedule`} label="View Schedule" external/>
+        <QuickLink href={`/tournaments/${id}/practice`} label="View Practice Fields" external />
         {isDirector && (
           <QuickLink href={`/dashboard/tournaments/${id}/volunteers`} label="Volunteers" />
         )}
@@ -95,12 +97,12 @@ export default async function TournamentPage({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <SummaryCard
+        {canViewAnyTeam && (<SummaryCard
           title="Teams"
           count={tournament.teams.length}
           href={`/dashboard/tournaments/${id}/teams`}
           action={isDirector ? "Manage" : "View"}
-        />
+        />)}
 
         
         {tournament.fields.some((f) => f.isPractice) && (
@@ -154,46 +156,6 @@ export default async function TournamentPage({
           />)}
         </div>
       )}
-
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-            Classes
-          </h2>
-          {tournament.classes.length === 0 ? (
-            <p className="text-sm text-zinc-400">No classes.</p>
-          ) : (
-            <ul className="space-y-1">
-              {tournament.classes.map((c) => (
-                <li key={c.id} className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {c.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-            Team Members
-          </h2>
-          {tournament.userRoles.length === 0 ? (
-            <p className="text-sm text-zinc-400">No roles assigned.</p>
-          ) : (
-            <ul className="space-y-1">
-              {tournament.userRoles.filter((r) => r.role !== "TEAM_LEAD").map((r) => (
-                <li key={r.id} className="flex items-center justify-between text-sm">
-                  <span className="text-zinc-700 dark:text-zinc-300">
-                    {r.user.name ?? r.user.email}
-                  </span>
-                  <span className="text-xs text-zinc-400">{r.role}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
-
       {(isTeamLead || canViewAnyTeam) && (
         <TeamDashboardPanel
           tournamentId={id}

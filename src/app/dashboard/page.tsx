@@ -3,7 +3,6 @@ import { auth } from "@/server/auth";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { userTournamentRoles, tournaments } from "@/db/schema";
-import { CompetitionTypesClient } from "./competition-types/CompetitionTypesClient";
 
 export default async function DashboardPage() {
   const [session, activeTournaments] = await Promise.all([
@@ -86,14 +85,7 @@ export default async function DashboardPage() {
           <h2 className="border-l-2 border-violet-400 pl-3 text-xl font-semibold text-zinc-900 dark:border-violet-600 dark:text-zinc-50">
             My Tournaments
           </h2>
-          {session?.user && (
-            <Link
-              href="/dashboard/tournaments/new"
-              className="rounded-lg bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600"
-            >
-              New Tournament
-            </Link>
-          )}
+          
         </div>
 
         {!session?.user ? (
@@ -167,28 +159,6 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* ── Competition Types ────────────────────────────────────── */}
-      <section>
-        <h2 className="mb-6 border-l-2 border-violet-400 pl-3 text-xl font-semibold text-zinc-900 dark:border-violet-600 dark:text-zinc-50">
-          Competition Types
-        </h2>
-
-        {!session?.user ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 p-12 text-center dark:border-zinc-700">
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Sign in to manage competition types.
-            </p>
-            <Link
-              href="/login"
-              className="mt-2 inline-block text-sm font-medium text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-50"
-            >
-              Sign in
-            </Link>
-          </div>
-        ) : (
-          <CompetitionTypesClient currentUserId={session.user.id} />
-        )}
-      </section>
     </div>
   );
 }
