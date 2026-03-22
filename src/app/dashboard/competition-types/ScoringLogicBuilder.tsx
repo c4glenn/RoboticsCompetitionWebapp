@@ -199,7 +199,7 @@ function RuleCard({
             required
             value={rule.pointsPer}
             onChange={(e) => onChange({ pointsPer: Number(e.target.value) })}
-            className={`${inputCls} max-w-[120px]`}
+            className={`${inputCls} max-w-30`}
           />
         </div>
       )}
