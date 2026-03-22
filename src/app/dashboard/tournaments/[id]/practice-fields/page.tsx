@@ -322,11 +322,28 @@ export default function PracticeFieldsPage({
             </thead>
             <tbody className="divide-y divide-zinc-100 bg-white dark:divide-zinc-800/50 dark:bg-zinc-950">
               {slotData.slotBoundaries.map((slotIso) => {
-                const isPast = new Date(slotIso) <= now;
+                const slotStart = new Date(slotIso);
+                const slotEnd = new Date(slotStart.getTime() + slotData.slotDurationMinutes * 60_000);
+                const isActive = slotStart <= now && now < slotEnd;
+                const isPast = slotEnd <= now;
                 return (
-                  <tr key={slotIso} className={isPast ? "opacity-40" : ""}>
+                  <tr
+                    key={slotIso}
+                    className={
+                      isPast
+                        ? "opacity-40"
+                        : isActive
+                        ? "bg-violet-50 dark:bg-violet-950/20"
+                        : ""
+                    }
+                  >
                     <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
                       {formatSlotTime(slotIso)}
+                      {isActive && (
+                        <span className="ml-2 inline-block rounded-full bg-violet-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none tracking-wide text-white">
+                          Now
+                        </span>
+                      )}
                     </td>
                     {slotData.fields.map((f) => {
                       const booking = bookingMap[f.id]?.[slotIso];
@@ -338,6 +355,7 @@ export default function PracticeFieldsPage({
                         booking && cancellingIds.has(booking.id);
                       const canCancel =
                         !isPast &&
+                        !isActive &&
                         booking &&
                         !isCancelling &&
                         (isDirector ||
@@ -378,7 +396,7 @@ export default function PracticeFieldsPage({
                                 </button>
                               )}
                             </div>
-                          ) : !isPast ? (
+                          ) : !isPast && !isActive ? (
                             <button
                               onClick={() => handleBookClick(f.id, slotIso)}
                               disabled={isSubmitting}
