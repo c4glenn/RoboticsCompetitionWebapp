@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { trpc } from "@/lib/trpc-client";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/server/trpc/router";
 import type { FormField } from "@/db/schema/tournaments";
 import { FormSchemaBuilder } from "./FormSchemaBuilder";
 import {
@@ -13,9 +15,8 @@ import {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type CompType = NonNullable<
-  ReturnType<typeof trpc.competitionTypes.list.useQuery>["data"]
->[number];
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type CompType = RouterOutput["competitionTypes"]["list"][number];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
