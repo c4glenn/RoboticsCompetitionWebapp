@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users, teams, userTournamentRoles } from "@/db/schema";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -41,7 +41,28 @@ export async function registerUser(
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  await db.insert(users).values({ name, email, passwordHash });
+  const [newUser] = await db.insert(users).values({ name, email, passwordHash }).returning({ id: users.id });
+
+  // Link any teams that were pre-registered with this email
+  const matchingTeams = await db.query.teams.findMany({
+    where: eq(teams.teamLeadEmail, email),
+    columns: { id: true, tournamentId: true },
+  });
+
+  if (matchingTeams.length > 0) {
+    await Promise.all([
+      ...matchingTeams.map((team) =>
+        db.update(teams).set({ teamLeadUserId: newUser.id }).where(eq(teams.id, team.id))
+      ),
+      db.insert(userTournamentRoles)
+        .values(matchingTeams.map((team) => ({
+          userId: newUser.id,
+          tournamentId: team.tournamentId,
+          role: "TEAM_LEAD" as const,
+        })))
+        .onConflictDoNothing(),
+    ]);
+  }
 
   return { success: true };
 }
