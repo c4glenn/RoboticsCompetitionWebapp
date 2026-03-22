@@ -21,9 +21,7 @@ services:
           memory: 256m
 
   app:
-    build:
-      context: .
-      target: runner
+    image: ghcr.io/c4glenn/robotics-competition-webapp:latest
     restart: unless-stopped
     ports: 
      - 32444:3000
