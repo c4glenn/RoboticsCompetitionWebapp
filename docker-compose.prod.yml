@@ -42,4 +42,4 @@ services:
 volumes:
   postgres_data:
   postgres_backups:
-  uploads_data:
+  uploads_data: ~/mnt/shared/aeonix/uploads/
