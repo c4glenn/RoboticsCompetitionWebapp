@@ -89,6 +89,9 @@ export default async function TournamentPage({
         {isDirector && (
           <QuickLink href={`/dashboard/tournaments/${id}/volunteers`} label="Volunteers" />
         )}
+        {isDirector && (
+          <QuickLink href={`/dashboard/tournaments/${id}/email`} label="Email" />
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

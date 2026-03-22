@@ -9,6 +9,7 @@ import { leaderboardRouter } from "./routers/leaderboard";
 import { matchesRouter } from "./routers/matches";
 import { volunteerApplicationsRouter } from "./routers/volunteerApplications";
 import { practiceFieldsRouter } from "./routers/practiceFields";
+import { emailRouter } from "./routers/email";
 
 export const appRouter = router({
   tournaments: tournamentsRouter,
@@ -21,6 +22,7 @@ export const appRouter = router({
   matches: matchesRouter,
   volunteerApplications: volunteerApplicationsRouter,
   practiceFields: practiceFieldsRouter,
+  email: emailRouter,
 });
 
 export type AppRouter = typeof appRouter;
