@@ -110,12 +110,6 @@ export default async function DashboardPage() {
         ) : myTournaments!.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-300 p-12 text-center dark:border-zinc-700">
             <p className="text-sm text-zinc-500">No tournaments yet.</p>
-            <Link
-              href="/dashboard/tournaments/new"
-              className="mt-2 inline-block text-sm font-medium text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-50"
-            >
-              Create your first tournament
-            </Link>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
