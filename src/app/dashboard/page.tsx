@@ -67,6 +67,13 @@ export default async function DashboardPage() {
                     See Schedule
                   </Link>
                   <Link
+                    href={`/tournaments/${tournament.id}/practice`}
+                    className="rounded-lg border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-violet-300 hover:text-violet-700 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:text-violet-400"
+                  >
+                    See Practice Table Slots
+                  </Link>
+
+                  <Link
                     href={`/tournaments/${tournament.id}/apply`}
                     className="rounded-lg bg-violet-700 px-4 py-2 text-center text-sm font-medium text-white hover:bg-violet-600"
                   >
