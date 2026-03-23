@@ -104,15 +104,7 @@ export default async function TournamentPage({
           action={isDirector ? "Manage" : "View"}
         />)}
 
-        
-        {tournament.fields.some((f) => f.isPractice) && (
-          <SummaryCard
-            title="Practice Fields"
-            count={tournament.fields.filter((f) => f.isPractice).length}
-            href={`/dashboard/tournaments/${id}/practice-fields`}
-            action="Book Slots"
-          />
-        )}
+
         {isDirector && (<SummaryCard
           title="Matches"
           count={tournament.matches.length}
