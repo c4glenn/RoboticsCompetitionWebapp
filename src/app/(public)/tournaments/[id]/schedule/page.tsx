@@ -181,8 +181,9 @@ export default async function SchedulePage({ params }: Props) {
                             {fieldNames || "—"}
                           </td>
                           <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                            
                             {match.scheduledAt
-                              ? match.scheduledAt.toLocaleTimeString([], {
+                              ? new Date(match.scheduledAt).toLocaleTimeString([], {
                                   hour: "2-digit",
                                   minute: "2-digit",
                                 })
