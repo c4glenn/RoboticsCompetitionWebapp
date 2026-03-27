@@ -39,6 +39,9 @@ export default function SettingsPage({
   const [practiceSlotDuration, setPracticeSlotDuration] = useState<string>("15");
   const [maxFuturePracticeSlots, setMaxFuturePracticeSlots] = useState<string>("1");
 
+  // --- Timezone ---
+  const [timezone, setTimezone] = useState<string>("America/New_York");
+
   useEffect(() => {
     if (tournament) {
       setMatchesPerTeam(String(tournament.matchesPerTeam ?? 3));
@@ -47,6 +50,7 @@ export default function SettingsPage({
       setShowJudgingScores(tournament.showJudgingScores ?? false);
       setPracticeSlotDuration(String(tournament.practiceSlotDurationMinutes ?? 15));
       setMaxFuturePracticeSlots(String(tournament.maxFuturePracticeSlots ?? 1));
+      setTimezone(tournament.timezone ?? "America/New_York");
     }
   }, [tournament]);
 
@@ -374,6 +378,7 @@ export default function SettingsPage({
                   n: aggMethod === "best_n" ? parseInt(aggN) : undefined,
                 },
                 showJudgingScores,
+                timezone,
               });
             }}
             className="space-y-4"
@@ -467,6 +472,22 @@ export default function SettingsPage({
                 </button>
               </div>
             )}
+            <div>
+              <label className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Tournament timezone
+              </label>
+              <input
+                type="text"
+                required
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+                placeholder="e.g. America/New_York"
+                className={inputCls + " w-64"}
+              />
+              <p className="mt-1 text-xs text-zinc-400">
+                IANA timezone used to display match times (e.g. America/Chicago, America/Los_Angeles).
+              </p>
+            </div>
             <button
               type="submit"
               disabled={updateSettings.isPending}

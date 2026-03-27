@@ -186,6 +186,7 @@ export default async function SchedulePage({ params }: Props) {
                               ? new Date(match.scheduledAt).toLocaleTimeString([], {
                                   hour: "2-digit",
                                   minute: "2-digit",
+                                  timeZone: tournament.timezone,
                                 })
                               : "—"}
                           </td>

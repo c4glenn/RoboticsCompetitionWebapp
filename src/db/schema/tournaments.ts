@@ -98,6 +98,8 @@ export const tournaments = pgTable("tournaments", {
   maxFuturePracticeSlots: integer("max_future_practice_slots")
     .notNull()
     .default(1),
+  /** IANA timezone identifier for this tournament (e.g. "America/New_York"). */
+  timezone: text("timezone").notNull().default("America/New_York"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

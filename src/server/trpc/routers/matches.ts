@@ -271,7 +271,7 @@ export const matchesRouter = router({
       z.object({
         tournamentId: z.string(),
         /** Total teams competing in one match. */
-        teamsPerMatch: z.number().int().min(2).max(10),
+        teamsPerMatch: z.number().int().min(1).max(10),
         /** Teams assigned to each field within a match (must divide teamsPerMatch). */
         teamsPerField: z.number().int().min(1).max(10),
         /** Fields to use; each field runs one match at a time. */

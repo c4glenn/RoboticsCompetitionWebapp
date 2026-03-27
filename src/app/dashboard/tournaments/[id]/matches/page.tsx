@@ -16,6 +16,35 @@ const STATUS_LABELS: Record<MatchStatus, string> = {
   CANCELLED: "Cancelled",
 };
 
+// ── Timezone helpers ──────────────────────────────────────────────────────────
+
+/**
+ * Convert a datetime-local input value (e.g. "2024-03-23T09:00") to a UTC ISO
+ * string, treating the input as being in `timezone` rather than the browser's
+ * local timezone.
+ */
+function naiveToUTC(datetimeLocal: string, timezone: string): string {
+  const withSeconds = datetimeLocal.length === 16 ? datetimeLocal + ":00" : datetimeLocal;
+  const [dateStr, timeStr] = withSeconds.split("T");
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const [hour, minute, second] = timeStr.split(":").map(Number);
+
+  // Treat the components as UTC first, then compute the offset
+  const asUTC = new Date(Date.UTC(year, month - 1, day, hour, minute, second ?? 0));
+
+  // Format that UTC moment in the target timezone to find the offset
+  const tzStr = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: timezone,
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    hour12: false,
+  }).format(asUTC); // e.g. "2024-03-23 03:00:00"
+
+  const tzAsUTC = new Date(tzStr.replace(" ", "T") + "Z");
+  const offsetMs = asUTC.getTime() - tzAsUTC.getTime();
+  return new Date(asUTC.getTime() + offsetMs).toISOString();
+}
+
 // ── Break type ────────────────────────────────────────────────────────────────
 interface BreakEntry {
   id: number;
@@ -63,7 +92,7 @@ export default function MatchesPage({
       tournamentId,
       matchType,
       roundNumber: roundNumber ? parseInt(roundNumber) : undefined,
-      scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
+      scheduledAt: scheduledAt ? naiveToUTC(scheduledAt, tournament?.timezone ?? "UTC") : undefined,
     });
   }
 
@@ -149,12 +178,12 @@ export default function MatchesPage({
       teamsPerField: parseInt(schedTeamsPerField),
       fieldIds: schedFieldIds,
       sides: tournament?.matchSides ?? [],
-      startsAt: new Date(schedStartsAt).toISOString(),
+      startsAt: naiveToUTC(schedStartsAt, tournament?.timezone ?? "UTC"),
       betweenMatchMinutes: parseInt(schedBetween),
       breaks: validBreaks.map((b) => ({
         label: b.label,
-        startsAt: new Date(b.startsAt).toISOString(),
-        endsAt: new Date(b.endsAt).toISOString(),
+        startsAt: naiveToUTC(b.startsAt, tournament?.timezone ?? "UTC"),
+        endsAt: naiveToUTC(b.endsAt, tournament?.timezone ?? "UTC"),
       })),
     });
   }
@@ -312,7 +341,7 @@ export default function MatchesPage({
               <input
                 required
                 type="number"
-                min={2}
+                min={1}
                 max={10}
                 value={schedTeamsPerMatch}
                 onChange={(e) => setSchedTeamsPerMatch(e.target.value)}
